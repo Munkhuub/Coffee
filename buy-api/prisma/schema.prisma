@@ -1,9 +1,61 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiMDFKVlkxSjQwMEZIQTVCUlRLTVI2MFRXWlciLCJ0ZW5hbnRfaWQiOiIxZjMzNjcwNDIwYjdhMTk0OGUzNmExNTZjZWU1NzhjOWE5YjFjY2U2MzdlZTRmZTQzYWRiZmY4YzdlZjMzOGVlIiwiaW50ZXJuYWxfc2VjcmV0IjoiMTAzYmEzMWUtNjliNy00MzYzLWE5YmItOWJhYWRlZjllMDc1In0.bT2BaJhspW8GKwxzFg36S7pbrmkebWUc0X6_uNz9Z4k"
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  password  String
+  username  String @unique
+  profile   Profile?
+  bankCard  BankCard?
+  donations Donation[]
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+
+
+model Profile {
+  id               Int     @id @default(autoincrement())
+  name             String  @unique
+  about            String
+  avatarImage      String
+  SocialMideaUrl   String
+  backgroundImage  String
+  succesMessage    String
+  userId           Int @unique
+  user             User @relation(fields: [userId], references: [id]) 
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+model BankCard {
+  id         Int @id @default(autoincrement())
+  country    String
+  firstname  String
+  lastname   String
+  cardNumber String
+  expiryDate Int
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+model Donation {
+  id                      Int @id @default(autoincrement())
+  amount                  Int
+  specialMessage          String
+  socialURLOrBuyMeACoffee String
+  donorId                 Int
+  recipientId             Int @unique
+  recipient               User @relation(fields: [recipientId], references: [id])
+  createdAt               DateTime
+  updatedAt               DateTime
 }
