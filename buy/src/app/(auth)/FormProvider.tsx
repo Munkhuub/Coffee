@@ -5,13 +5,13 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { useAuth } from "../_providers/AuthProvider";
 
 export const loginSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-// Define validation schemas
 export const usernameSchema = z.object({
   username: z
     .string()
@@ -45,17 +45,8 @@ export const emailPasswordSchema = z
 
 export type UsernameFormValues = z.infer<typeof usernameSchema>;
 export type EmailPasswordFormValues = z.infer<typeof emailPasswordSchema>;
-
 export type FormValues = UsernameFormValues & EmailPasswordFormValues;
 
-// Mock auth service
-const signUp = async (values: FormValues) => {
-  // This would be your actual signup API call
-  console.log("Signing up with:", values);
-  return new Promise((resolve) => setTimeout(resolve, 1000));
-};
-
-// Context type
 type FormContextType = {
   step: number;
   nextStep: () => void;
@@ -68,16 +59,14 @@ type FormContextType = {
   handleSubmit: () => Promise<void>;
 };
 
-// Create context
 export const FormContext = createContext<FormContextType | null>(null);
 
-// Provider props
 type FormProviderProps = {
   children: React.ReactNode;
 };
 
 export const FormProvider = ({ children }: FormProviderProps) => {
-  // State
+  const { signUp } = useAuth();
   const [step, setStep] = useState(0);
   const [formValues, setFormValues] = useState<FormValues>({
     username: "",
@@ -87,7 +76,6 @@ export const FormProvider = ({ children }: FormProviderProps) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form hooks
   const usernameForm = useForm<UsernameFormValues>({
     resolver: zodResolver(usernameSchema),
     mode: "onChange",
@@ -106,7 +94,6 @@ export const FormProvider = ({ children }: FormProviderProps) => {
     },
   });
 
-  // Navigation functions
   const nextStep = () => {
     setStep((prev) => prev + 1);
   };
@@ -115,19 +102,28 @@ export const FormProvider = ({ children }: FormProviderProps) => {
     setStep((prev) => Math.max(0, prev - 1));
   };
 
-  // Update form values
   const updateFormValues = (values: Partial<FormValues>) => {
     setFormValues((prev) => ({ ...prev, ...values }));
   };
 
-  // Submit handler
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    console.log("hi1");
+
     try {
-      await signUp(formValues);
+      console.log("hi2");
+
+      await signUp({
+        username: formValues.username,
+        email: formValues.email,
+        password: formValues.password,
+      });
+      console.log("hi3");
+
       toast.success("Account created successfully!");
-      // Here you would redirect to the next page
     } catch (error) {
+      console.error("Signup error:", error);
+
       toast.error("Signup failed");
     } finally {
       setIsSubmitting(false);

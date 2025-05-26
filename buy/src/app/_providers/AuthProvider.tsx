@@ -1,0 +1,144 @@
+"use client";
+import { useRouter } from "next/navigation";
+import { PropsWithChildren, useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { createContext } from "react";
+import { api, setAuthToken } from "@/axios";
+
+export type User = {
+  id: number;
+  username: string;
+  email: string;
+};
+type getMeTypes = {
+  token: string;
+  user: User;
+};
+
+type AuthContextType = {
+  user?: User;
+  setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
+  loading: boolean;
+  signIn: ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => Promise<void>;
+  signUp: ({
+    email,
+    password,
+    username,
+  }: {
+    email: string;
+    password: string;
+    username: string;
+  }) => Promise<void>;
+  signOut: () => Promise<void>;
+};
+
+const AuthContext = createContext({} as AuthContextType);
+
+export const AuthProvider = ({ children }: PropsWithChildren) => {
+  const router = useRouter();
+  const [user, setUser] = useState<User>();
+  const [loading, setLoading] = useState(false);
+
+  const signIn = async ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => {
+    try {
+      const { data } = await api.post<getMeTypes>("/auth/signin", {
+        email,
+        password,
+      });
+      console.log("SignIn response data:", data);
+
+      localStorage.setItem("token", data.token);
+      setUser(data.user);
+
+      setAuthToken(data.token);
+
+      router.push("/");
+    } catch (error) {
+      console.error("Signin error:", error);
+      toast.error("Failed to sign in");
+    }
+  };
+
+  const signUp = async ({
+    username,
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+    username: string;
+  }) => {
+    console.log("hi11");
+
+    try {
+      const { data } = await api.post<getMeTypes>("/auth/signup", {
+        username,
+        email,
+        password,
+      });
+
+      localStorage.setItem("token", data.token);
+      setUser(data.user);
+
+      setAuthToken(data.token);
+
+      router.push("/");
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast.error("Failed to sign up");
+    }
+  };
+
+  const signOut = async () => {
+    localStorage.removeItem("token");
+    setUser(undefined);
+    setAuthToken("");
+    router.push("/signin");
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    setAuthToken(token);
+
+    const getUser = async () => {
+      setLoading(true);
+      try {
+        const { data } = await api.get<User>("/auth/me");
+        setUser(data);
+      } catch (error) {
+        console.error("Token validation failed:", error);
+        localStorage.removeItem("token");
+        setUser(undefined);
+        setAuthToken("");
+      } finally {
+        setLoading(false);
+      }
+    };
+    getUser();
+  }, []);
+
+  return (
+    <AuthContext.Provider
+      value={{ user, signIn, signUp, signOut, loading, setUser }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);

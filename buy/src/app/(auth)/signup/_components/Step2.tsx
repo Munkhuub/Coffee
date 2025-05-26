@@ -23,8 +23,7 @@ export const Step2 = () => {
     formState,
   } = emailPasswordForm;
 
-  const onSubmit = handleFormSubmit(async (data) => {
-    updateFormValues(data);
+  const onSubmit = handleFormSubmit(async () => {
     await handleSubmit();
   });
 

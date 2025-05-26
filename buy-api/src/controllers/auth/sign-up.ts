@@ -13,21 +13,13 @@ export const signup: RequestHandler = async (req, res) => {
     return;
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    res.status(400).json({ message: "Invalid email format" });
-    return;
-  }
-
-  if (password.length < 6) {
-    res
-      .status(400)
-      .json({ message: "Password must be at least 6 characters long" });
-    return;
-  }
+  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // if (!emailRegex.test(email)) {
+  //   res.status(400).json({ message: "Invalid email format" });
+  //   return;
+  // }
 
   try {
-    // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: { email },
     });
@@ -37,7 +29,6 @@ export const signup: RequestHandler = async (req, res) => {
       return;
     }
 
-    // Check if username is taken (if usernames should be unique)
     const existingUsername = await prisma.user.findFirst({
       where: { username },
     });
@@ -47,10 +38,8 @@ export const signup: RequestHandler = async (req, res) => {
       return;
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12); // Use higher salt rounds
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create new user - correct Prisma syntax
     const newUser = await prisma.user.create({
       data: {
         username,
@@ -61,7 +50,6 @@ export const signup: RequestHandler = async (req, res) => {
       },
     });
 
-    // Check JWT_SECRET
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       console.error("JWT_SECRET environment variable is not set");
@@ -69,21 +57,19 @@ export const signup: RequestHandler = async (req, res) => {
       return;
     }
 
-    // Create JWT token
     const token = jwt.sign(
       {
-        userId: newUser.id, // This will be a number based on your schema
+        userId: newUser.id,
       },
       jwtSecret,
-      { expiresIn: "24h" } // Add expiration
+      { expiresIn: "24h" }
     );
 
-    // Remove password from response - correct destructuring for Prisma
     const { password: _, ...userWithoutPassword } = newUser;
 
     res.status(201).json({
       user: userWithoutPassword,
-      token: `Bearer ${token}`, // Add Bearer prefix
+      token: `Bearer ${token}`,
     });
   } catch (error) {
     console.error("Signup error:", error);

@@ -1,9 +1,8 @@
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt"; // Add this import
-import { RequestHandler } from "express";
+import bcrypt from "bcrypt";
 import { prisma } from "../../db";
 
-export const signin: RequestHandler = async (req, res) => {
+export const signin = async (req, res) => {
   const { email, password } = req.body;
   console.log("Signin attempt:", email);
 
@@ -39,7 +38,6 @@ export const signin: RequestHandler = async (req, res) => {
       return;
     }
 
-    // Create JWT token
     const token = jwt.sign(
       {
         userId: user.id,
@@ -48,12 +46,9 @@ export const signin: RequestHandler = async (req, res) => {
       { expiresIn: "24h" }
     );
 
-    // Remove password from user object before sending response
     const { password: _, ...userWithoutPassword } = user;
 
-    res.status(200).json({
-      message: "Amjilttai signin",
-    });
+    return res.status(200).json({ user: userWithoutPassword, token });
   } catch (error) {
     console.error("Signin error:", error);
     res.status(500).json({
