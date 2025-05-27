@@ -108,28 +108,32 @@ export const FormProvider = ({ children }: FormProviderProps) => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    console.log("hi1");
+
+    const latestUsername = usernameForm.getValues();
+    const latestEmailPassword = emailPasswordForm.getValues();
+
+    const combinedValues = {
+      ...latestUsername,
+      ...latestEmailPassword,
+    };
+
+    setFormValues(combinedValues);
 
     try {
-      console.log("hi2");
-
       await signUp({
-        username: formValues.username,
-        email: formValues.email,
-        password: formValues.password,
+        username: combinedValues.username,
+        email: combinedValues.email,
+        password: combinedValues.password,
       });
-      console.log("hi3");
 
       toast.success("Account created successfully!");
     } catch (error) {
       console.error("Signup error:", error);
-
       toast.error("Signup failed");
     } finally {
       setIsSubmitting(false);
     }
   };
-
   const value: FormContextType = {
     step,
     nextStep,

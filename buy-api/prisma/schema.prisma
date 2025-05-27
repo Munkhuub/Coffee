@@ -26,9 +26,9 @@ model Profile {
   name             String  @unique
   about            String
   avatarImage      String
-  SocialMideaUrl   String
+  socialMediaUrl   String
   backgroundImage  String
-  succesMessage    String
+  successMessage   String
   userId           Int @unique
   user             User @relation(fields: [userId], references: [id]) 
   createdAt DateTime

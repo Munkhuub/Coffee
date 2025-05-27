@@ -48,6 +48,11 @@ export const signup: RequestHandler = async (req, res) => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      include: {
+        profile: true,
+        bankCard: true,
+        donations: true,
+      },
     });
 
     const jwtSecret = process.env.JWT_SECRET;
@@ -74,7 +79,6 @@ export const signup: RequestHandler = async (req, res) => {
   } catch (error) {
     console.error("Signup error:", error);
 
-    // Handle Prisma unique constraint errors
     if (error.code === "P2002") {
       res.status(400).json({ message: "Email or username already exists" });
       return;

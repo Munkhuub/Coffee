@@ -1,4 +1,5 @@
 import React from "react";
+import countries from "world-countries";
 import {
   Select,
   SelectContent,
@@ -10,6 +11,15 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@radix-ui/react-label";
 
+type Country = {
+  cca2: string; // 2-letter country code
+  cca3: string; // 3-letter country code
+  name: {
+    common: string;
+    official: string;
+  };
+};
+
 const SelectCountry = () => {
   return (
     <Select>
@@ -20,8 +30,11 @@ const SelectCountry = () => {
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Fruits</SelectLabel>
-          <SelectItem value="apple">Apple</SelectItem>
-          <SelectItem value="banana">Banana</SelectItem>
+          {countries.map((country, i) => (
+            <SelectItem value={country.cca2} key={i}>
+              {country.name.common}
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>

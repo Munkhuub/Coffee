@@ -15,6 +15,11 @@ export const signin = async (req, res) => {
   try {
     const user = await prisma.user.findFirst({
       where: { email },
+      include: {
+        profile: true,
+        bankCard: true,
+        donations: true,
+      },
     });
 
     if (!user) {

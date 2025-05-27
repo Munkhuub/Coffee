@@ -4,52 +4,205 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { CameraIcon } from "lucide-react";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { useFormContext } from "../../FormProvider";
+import { useAuth } from "@/app/_providers/AuthProvider";
+import { UpdateImage } from "./UpdateImage";
+import { api } from "@/axios";
+
+const profileSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(50, "Name must be less than 50 characters"),
+  about: z
+    .string()
+    .max(500, "About must be less than 500 characters")
+    .optional(),
+  socialMediaUrl: z
+    .string()
+    .url("Please enter a valid URL")
+    .optional()
+    .or(z.literal("")),
+  avatarImage: z.string().optional(),
+});
+
+type ProfileFormData = z.infer<typeof profileSchema>;
+
+type ProfileType = {
+  id: number;
+  name: string;
+  about: string;
+  avatarImage: string;
+  socialMediaUrl: string;
+  backgroundImage: string;
+  successMessage: string;
+  userId: number;
+};
 
 const Profile = () => {
-  const { nextStep, updateFormValues } = useFormContext();
+  const { nextStep, updateFormValues, step } = useFormContext();
+  const { user, loading } = useAuth();
+  const [profile, setProfile] = useState<ProfileType | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleContinue = () => {
-    updateFormValues({
-      username: "name",
-    });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      about: "",
+      socialMediaUrl: "",
+      avatarImage: "",
+    },
+  });
 
-    nextStep();
+  const avatarImage = watch("avatarImage");
+
+  useEffect(() => {
+    if (user?.profile) {
+      nextStep();
+    }
+  }, [profile, nextStep]);
+
+  if (loading) {
+    return (
+      <div className="text-[14px] w-[510px] flex flex-col gap-6">
+        <p className="text-2xl font-semibold">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="text-[14px] w-[510px] flex flex-col gap-6">
+        <p className="text-2xl font-semibold">Please log in to continue</p>
+      </div>
+    );
+  }
+
+  if (profile?.id) {
+    return null;
+  }
+
+  const onSubmit = async (data: ProfileFormData) => {
+    setIsSubmitting(true);
+    try {
+      const userId = user?.id;
+
+      if (!userId) {
+        console.error("User not found:", user);
+        throw new Error("Please log in to create a profile");
+      }
+
+      console.log("Creating profile for user ID:", userId);
+
+      const response = await api.post<ProfileType>(`/profile`, {
+        ...data,
+        backgroundImage: "",
+        successMessage: "",
+        userId,
+      });
+
+      setProfile(response.data);
+      console.log("Profile created:", response.data);
+
+      updateFormValues({
+        username: data.name,
+      });
+
+      nextStep();
+    } catch (err) {
+      console.error("Error creating profile:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div>
       <div className="text-[14px] w-[510px] flex flex-col gap-6">
         <p className="text-2xl font-semibold">Complete your profile page</p>
-        <div className="flex flex-col gap-3">
-          <p>Add photo</p>
-          <div className="size-40 rounded-full border border-dashed border-[#E4E4E7] flex items-center justify-center">
-            <CameraIcon className="size-7 text-[#E4E4E7]" />
-          </div>
-        </div>
-        <div className="flex flex-col gap-3 w-full">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" type="text" placeholder="Enter your name here" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="about">About</Label>
-            <Textarea
-              id="about"
-              placeholder="Write about yourself here"
-              className="h-[131px] w-full"
+
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+          <div className="flex flex-col gap-3">
+            <p>Add photo</p>
+            <UpdateImage
+              onChange={(url) =>
+                setValue("avatarImage", url, { shouldValidate: true })
+              }
+              defaultValue={avatarImage}
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="url">Social media URL</Label>
-            <Input id="url" type="url" placeholder="https://" />
+
+          <div className="flex flex-col gap-3 w-full">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="name">Name *</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Enter your name here"
+                {...register("name")}
+                className={errors.name ? "border-red-500" : ""}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name.message}</p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="about">About</Label>
+              <Textarea
+                id="about"
+                placeholder="Write about yourself here"
+                className={`h-[131px] w-full ${
+                  errors.about ? "border-red-500" : ""
+                }`}
+                {...register("about")}
+              />
+              {errors.about && (
+                <p className="text-red-500 text-sm">{errors.about.message}</p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="socialMediaUrl">Social media URL</Label>
+              <Input
+                id="socialMediaUrl"
+                type="url"
+                placeholder="https://"
+                {...register("socialMediaUrl")}
+                className={errors.socialMediaUrl ? "border-red-500" : ""}
+              />
+              {errors.socialMediaUrl && (
+                <p className="text-red-500 text-sm">
+                  {errors.socialMediaUrl.message}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-        <Button className="w-[246px] ml-auto" onClick={handleContinue}>
-          Continue
-        </Button>
+
+          <div className="flex gap-4">
+            <Button
+              type="submit"
+              className="w-[246px] ml-auto"
+              disabled={isSubmitting || !isValid || !user?.id}
+            >
+              {isSubmitting
+                ? "Creating Profile..."
+                : "Create Profile & Continue"}
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

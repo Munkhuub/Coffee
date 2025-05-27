@@ -5,11 +5,53 @@ import { toast } from "sonner";
 import { createContext } from "react";
 import { api, setAuthToken } from "@/axios";
 
+export type Profile = {
+  id: number;
+  name: string;
+  about: string;
+  avatarImage: string;
+  socialMediaUrl: string;
+  backgroundImage: string;
+  successMessage: string;
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type BankCard = {
+  id: number;
+  country: string;
+  firstname: string;
+  lastname: string;
+  cardNumber: string;
+  expiryDate: number;
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Donation = {
+  id: number;
+  amount: number;
+  specialMessage: string;
+  socialURLOrBuyMeACoffee: string;
+  donorId: number;
+  recipientId: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type User = {
   id: number;
-  username: string;
   email: string;
+  username: string;
+  profile?: Profile;
+  bankCard?: BankCard;
+  donations: Donation[];
+  createdAt: string;
+  updatedAt: string;
 };
+
 type getMeTypes = {
   token: string;
   user: User;
@@ -64,7 +106,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
       setAuthToken(data.token);
 
-      router.push("/");
+      router.push("/createProfile");
     } catch (error) {
       console.error("Signin error:", error);
       toast.error("Failed to sign in");
@@ -94,7 +136,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
       setAuthToken(data.token);
 
-      router.push("/");
+      router.push("/createProfile");
     } catch (error) {
       console.error("Signup error:", error);
       toast.error("Failed to sign up");
@@ -118,7 +160,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     const getUser = async () => {
       setLoading(true);
       try {
-        const { data } = await api.get<User>("/auth/me");
+        const { data } = await api.get<User>("/auth/getMe");
         setUser(data);
       } catch (error) {
         console.error("Token validation failed:", error);
