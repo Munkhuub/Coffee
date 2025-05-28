@@ -41,7 +41,8 @@ model BankCard {
   firstname  String
   lastname   String
   cardNumber String
-  expiryDate Int
+  expiryDate String
+  cvc        String
   userId Int @unique
   user User @relation(fields: [userId], references: [id])
   createdAt DateTime

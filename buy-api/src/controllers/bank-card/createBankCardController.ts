@@ -1,7 +1,7 @@
 import { prisma } from "../../db";
 
 const createBankCardController = async (req, res) => {
-  const { country, firstname, lastname, cardNumber, expiryDate, userId } =
+  const { country, firstname, lastname, cardNumber, expiryDate, userId, cvc } =
     req.body;
 
   try {
@@ -12,6 +12,7 @@ const createBankCardController = async (req, res) => {
         lastname,
         cardNumber,
         expiryDate,
+        cvc,
         userId,
         createdAt: new Date(),
         updatedAt: new Date(),

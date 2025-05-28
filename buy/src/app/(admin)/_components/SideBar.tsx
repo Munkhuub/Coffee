@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
 
@@ -6,7 +7,6 @@ const SideBar = () => {
 
   const menuItems = [
     { name: "Home", icon: null },
-    { name: "Explore", icon: null },
     { name: "View page", icon: <ExternalLink className="size-4" /> },
     { name: "Account settings", icon: null },
   ];

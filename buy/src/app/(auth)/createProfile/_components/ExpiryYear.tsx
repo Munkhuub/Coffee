@@ -4,25 +4,39 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 
-export const ExpiryYear = () => {
-  return (
-    <Select>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Year" />
-      </SelectTrigger>
+interface ExpiryYearProps {
+  onValueChange?: (value: string) => void;
+  error?: string;
+}
 
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Fruits</SelectLabel>
-          <SelectItem value="apple">Apple</SelectItem>
-          <SelectItem value="banana">Banana</SelectItem>
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+export const ExpiryYear: React.FC<ExpiryYearProps> = ({
+  onValueChange,
+  error,
+}) => {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 15 }, (_, i) => currentYear + i);
+
+  return (
+    <div>
+      <Select onValueChange={onValueChange}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Year" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            {years.map((year) => (
+              <SelectItem value={year.toString()} key={year}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      {error && <span className="text-red-500 text-sm">{error}</span>}
+    </div>
   );
 };

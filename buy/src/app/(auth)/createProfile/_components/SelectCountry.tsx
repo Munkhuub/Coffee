@@ -9,35 +9,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@radix-ui/react-label";
 
-type Country = {
-  cca2: string; // 2-letter country code
-  cca3: string; // 3-letter country code
-  name: {
-    common: string;
-    official: string;
-  };
-};
+interface SelectCountryProps {
+  onValueChange?: (value: string) => void;
+  error?: string;
+}
 
-const SelectCountry = () => {
+const SelectCountry: React.FC<SelectCountryProps> = ({
+  onValueChange,
+  error,
+}) => {
   return (
-    <Select>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Select" />
-      </SelectTrigger>
-
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Fruits</SelectLabel>
-          {countries.map((country, i) => (
-            <SelectItem value={country.cca2} key={i}>
-              {country.name.common}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+    <div>
+      <Select onValueChange={onValueChange}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Countries</SelectLabel>
+            {countries.map((country, i) => (
+              <SelectItem value={country.cca2} key={i}>
+                {country.name.common}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      {error && <span className="text-red-500 text-sm">{error}</span>}
+    </div>
   );
 };
 

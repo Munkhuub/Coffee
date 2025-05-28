@@ -12,6 +12,7 @@ import { useFormContext } from "../../FormProvider";
 import { useAuth } from "@/app/_providers/AuthProvider";
 import { UpdateImage } from "./UpdateImage";
 import { api } from "@/axios";
+import { useRouter } from "next/navigation";
 
 const profileSchema = z.object({
   name: z
@@ -48,6 +49,7 @@ const Profile = () => {
   const { user, loading } = useAuth();
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -69,11 +71,12 @@ const Profile = () => {
   const avatarImage = watch("avatarImage");
 
   useEffect(() => {
-    if (user?.profile) {
+    if (user?.profile && user?.bankCard) {
+      router.push("/admin");
+    } else if (user?.profile) {
       nextStep();
     }
-  }, [profile, nextStep]);
-
+  }, [user, nextStep, router]);
   if (loading) {
     return (
       <div className="text-[14px] w-[510px] flex flex-col gap-6">

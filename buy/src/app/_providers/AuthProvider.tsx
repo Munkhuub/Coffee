@@ -17,7 +17,6 @@ export type Profile = {
   createdAt: string;
   updatedAt: string;
 };
-
 export type BankCard = {
   id: number;
   country: string;
@@ -29,7 +28,6 @@ export type BankCard = {
   createdAt: string;
   updatedAt: string;
 };
-
 export type Donation = {
   id: number;
   amount: number;
