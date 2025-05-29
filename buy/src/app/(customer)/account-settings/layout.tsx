@@ -1,4 +1,4 @@
-import SideBar from "../_components/SideBar";
+import Header from "../_components/Header";
 
 export default function LaAdminyout({
   children,
@@ -6,8 +6,8 @@ export default function LaAdminyout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex lg:w-[1440px] m-auto min-h-[100vh]">
-      <SideBar />
+    <div className="lg:w-[1440px] m-auto min-h-[100vh]">
+      <Header />
       {children}
     </div>
   );

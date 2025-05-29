@@ -36,7 +36,7 @@ const AdminProfile = () => {
   }, [user, router]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 border border-[#E4E4E7] p-6 rounded-lg">
       <div className="flex justify-between">
         <div className="flex gap-3">
           <img

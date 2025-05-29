@@ -33,7 +33,7 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-type ProfileType = {
+export type ProfileType = {
   id: number;
   name: string;
   about: string;
@@ -72,11 +72,12 @@ const Profile = () => {
 
   useEffect(() => {
     if (user?.profile && user?.bankCard) {
-      router.push("/admin");
+      router.push("/");
     } else if (user?.profile) {
       nextStep();
     }
   }, [user, nextStep, router]);
+
   if (loading) {
     return (
       <div className="text-[14px] w-[510px] flex flex-col gap-6">

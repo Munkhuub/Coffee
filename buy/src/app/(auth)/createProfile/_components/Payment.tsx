@@ -14,7 +14,6 @@ import { useForm } from "react-hook-form";
 import { BankCard, useAuth } from "@/app/_providers/AuthProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { profile } from "console";
 
 const bankCardSchema = z.object({
   firstname: z
