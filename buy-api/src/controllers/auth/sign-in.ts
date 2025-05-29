@@ -4,9 +4,7 @@ import { prisma } from "../../db";
 
 export const signin = async (req, res) => {
   const { email, password } = req.body;
-  console.log("Signin attempt:", email);
 
-  // Validate input
   if (!email || !password) {
     res.status(400).json({ message: "Email and password are required" });
     return;
