@@ -33,7 +33,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 const ProfileSettings = () => {
   const { updateFormValues } = useFormContext();
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const {
@@ -53,47 +53,24 @@ const ProfileSettings = () => {
     },
   });
 
-  if (loading) {
-    return (
-      <div className="text-[14px] w-[510px] flex flex-col gap-6">
-        <p className="text-2xl font-semibold">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="text-[14px] w-[510px] flex flex-col gap-6">
-        <p className="text-2xl font-semibold">Please log in to continue</p>
-      </div>
-    );
-  }
-
   const onSubmit = async (data: ProfileFormData) => {
     setIsSubmitting(true);
     try {
-      const userId = user?.id;
+      const id = user?.profile?.id;
 
-      if (!userId) {
+      if (!user?.profile?.id) {
         console.error("User not found:", user);
         throw new Error("Please log in to create a profile");
       }
 
-      console.log("Creating profile for user ID:", userId);
+      console.log("Creating profile for user ID:", id);
 
-      const response = await api.put<ProfileType>(`/profile`, {
+      const response = await api.put<ProfileType>(`/profile/${id}`, {
         ...data,
-        backgroundImage: "",
-        successMessage: "",
-        userId,
       });
 
       setProfile(response.data);
-      console.log("Profile created:", response.data);
-
-      updateFormValues({
-        username: data.name,
-      });
+      console.log("Profile updated:", response.data);
     } catch (err) {
       console.error("Error creating profile:", err);
     } finally {
@@ -101,17 +78,21 @@ const ProfileSettings = () => {
     }
   };
   return (
-    <div className="text-[14px] w-[510px] flex flex-col gap-6">
+    <div className="text-[14px] w-[650px] flex flex-col gap-6 ">
       <p className="text-2xl font-semibold">My Profile</p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-6 rounded-lg border border-[#E4E4E7] p-6"
+      >
+        <h4 className="font-bold">Personal Info</h4>
         <div className="flex flex-col gap-3">
           <p>Add photo</p>
           <UpdateImage
             onChange={(url) =>
               setValue("avatarImage", url, { shouldValidate: true })
             }
-            defaultValue={user.profile?.avatarImage}
+            defaultValue={user?.profile?.avatarImage}
           />
         </div>
 
@@ -165,10 +146,10 @@ const ProfileSettings = () => {
         <div className="flex gap-4">
           <Button
             type="submit"
-            className="w-[246px] ml-auto"
+            className="w-full"
             disabled={isSubmitting || !isValid || !user?.id}
           >
-            {isSubmitting ? "Creating Profile..." : "Create Profile & Continue"}
+            {isSubmitting ? "Saving..." : "Save changes"}
           </Button>
         </div>
       </form>

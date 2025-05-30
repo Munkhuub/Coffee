@@ -176,7 +176,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     <AuthContext.Provider
       value={{ user, signIn, signUp, signOut, loading, setUser }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

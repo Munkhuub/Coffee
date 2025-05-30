@@ -1,14 +1,29 @@
 "use client";
 
+import { useAuth } from "@/app/_providers/AuthProvider";
 import SideBar from "../_components/SideBar";
+import { ChangePassword } from "./_components/ChangePassword";
+import PaymentSettings from "./_components/PaymentSettings";
 import ProfileSettings from "./_components/ProfileSettings";
 
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
 export default function Home() {
+  const { user, loading } = useAuth();
+
+  const router = useRouter();
+  if (!user && loading) {
+    router.push("/signin");
+    toast("Login to edit profile");
+  }
   return (
-    <div className="w-full flex">
+    <div className="w-full flex ml-20 ">
       <SideBar />
-      <div>
+      <div className="flex flex-col gap-8">
         <ProfileSettings />
+        <ChangePassword />
+        <PaymentSettings />
       </div>
     </div>
   );

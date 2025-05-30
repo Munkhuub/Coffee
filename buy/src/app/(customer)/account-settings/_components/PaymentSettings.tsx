@@ -4,83 +4,57 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
-import { useFormContext } from "../../FormProvider";
-import SelectCountry from "./SelectCountry";
-import { ExpiryMonth } from "./ExpiryMonth";
-import { ExpiryYear } from "./ExpiryYear";
 import { z } from "zod";
 import { api } from "@/axios";
 import { useForm } from "react-hook-form";
 import { BankCard, useAuth } from "@/app/_providers/AuthProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-
-export const bankCardSchema = z.object({
-  firstname: z
-    .string()
-    .min(1, "First Name is required")
-    .max(50, "Name must be less than 50 characters"),
-  lastname: z
-    .string()
-    .min(1, "Last Name is required")
-    .max(50, "Name must be less than 50 characters"),
-  cardNumber: z
-    .string()
-    .min(13, "Card Number is required")
-    .max(19, "Card number is too long")
-    .regex(/^\d+$/, "Card number must contain only digits"),
-  cvc: z
-    .string()
-    .min(3, "CVC must be at least 3 digits")
-    .max(4, "CVC must be at most 4 digits")
-    .regex(/^\d+$/, "CVC must be numeric"),
-  expiryMonth: z.string().min(1, "Expiry month is required"),
-  expiryYear: z.string().min(1, "Expiry year is required"),
-  country: z.string().min(1, "Country is required"),
-});
+import { ExpiryMonth } from "@/app/(auth)/createProfile/_components/ExpiryMonth";
+import { ExpiryYear } from "@/app/(auth)/createProfile/_components/ExpiryYear";
+import { bankCardSchema } from "@/app/(auth)/createProfile/_components/Payment";
+import SelectCountrySettings from "./SelectCountrySettings";
 
 type BankCardFormData = z.infer<typeof bankCardSchema>;
 
-const Payment = () => {
-  const { prevStep, isSubmitting } = useFormContext();
+const PaymentSettings = () => {
   const [bankCard, setBankCard] = useState<BankCard | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
   const Router = useRouter();
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors, isValid },
   } = useForm<BankCardFormData>({
     resolver: zodResolver(bankCardSchema),
     mode: "onChange",
     defaultValues: {
-      firstname: "",
-      lastname: "",
+      firstname: user?.bankCard?.firstname,
+      lastname: user?.bankCard?.lastname,
       cardNumber: "",
       cvc: "",
       expiryMonth: "",
       expiryYear: "",
-      country: "",
+      country: user?.bankCard?.country,
     },
   });
 
   const handleComplete = async (data: BankCardFormData) => {
+    setIsSubmitting(true);
     const { expiryMonth, expiryYear, ...dataWithoutExpiryDate } = data;
 
     try {
-      const userId = user?.id;
+      const id = user?.bankCard?.id;
       const expiryDate = `${expiryMonth}/${expiryYear.slice(-2)}`;
-      const response = await api.post<BankCard>(`/bankCard`, {
+      const response = await api.put<BankCard>(`/bankCard/${id}`, {
         ...dataWithoutExpiryDate,
-        userId,
         expiryDate,
       });
 
       setBankCard(response.data);
       console.log("Bank Card created:", response.data);
-      Router.push("/");
     } catch (error) {
       console.error("Error creating bank card:", error);
     }
@@ -88,16 +62,17 @@ const Payment = () => {
 
   return (
     <form
-      className="text-[14px] w-[510px] flex flex-col gap-6"
+      className="text-[14px] w-[650px] flex flex-col gap-6  rounded-lg border border-[#E4E4E7] p-6"
       onSubmit={handleSubmit(handleComplete)}
     >
       <p className="text-2xl font-semibold">Payment Information</p>
       <div className="flex flex-col gap-3 w-full text-[14px]">
         <div className="w-full flex flex-col gap-2">
           <Label htmlFor="country">Select Country</Label>
-          <SelectCountry
+          <SelectCountrySettings
             onValueChange={(value) => setValue("country", value)}
             error={errors.country?.message}
+            value={user?.bankCard?.country}
           />
         </div>
 
@@ -179,24 +154,15 @@ const Payment = () => {
 
       <div className="flex gap-4 justify-end">
         <Button
-          variant="outline"
-          className="w-[120px]"
-          onClick={prevStep}
-          disabled={isSubmitting}
-          type="button"
-        >
-          Back
-        </Button>
-        <Button
           className="w-[246px]"
           disabled={isSubmitting || !isValid}
           type="submit"
         >
-          {isSubmitting ? "Processing..." : "Complete"}
+          {isSubmitting ? "Saving..." : "Save changes"}
         </Button>
       </div>
     </form>
   );
 };
 
-export default Payment;
+export default PaymentSettings;

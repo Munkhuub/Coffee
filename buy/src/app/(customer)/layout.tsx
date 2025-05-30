@@ -5,5 +5,10 @@ export default function LaAdminyout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <div className="lg:w-[1440px] m-auto min-h-[100vh]">{children}</div>;
+  return (
+    <div className="lg:w-[1440px] m-auto min-h-[100vh]">
+      <Header />
+      {children}
+    </div>
+  );
 }

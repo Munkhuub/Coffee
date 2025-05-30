@@ -47,7 +47,6 @@ export default function Home() {
   if (isLoading) {
     return (
       <div>
-        <Header />
         <div className="flex items-center justify-center h-64">
           <p>Loading profile...</p>
         </div>
@@ -56,7 +55,6 @@ export default function Home() {
   }
   return (
     <div>
-      <Header />
       <UpdateCover
         defaultValue={backgroundImage}
         onChange={handleCoverChange}

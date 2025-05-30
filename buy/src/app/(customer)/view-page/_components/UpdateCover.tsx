@@ -68,7 +68,7 @@ export const UpdateCover = ({ defaultValue, onChange }: UpdateImageProps) => {
 
   const openFileDialog = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.click(); // 2️⃣ Trigger file input
+      fileInputRef.current.click();
     }
   };
 
