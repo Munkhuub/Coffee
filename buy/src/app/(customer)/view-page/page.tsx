@@ -3,21 +3,31 @@
 import Header from "../_components/Header";
 import Donation from "./_components/Donation";
 import { UpdateCover } from "./_components/UpdateCover";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import ViewPageProfile from "./_components/ViewPageProfile";
 import { api } from "@/axios";
-import { Profile } from "../../_providers/AuthProvider";
+import { Profile, useAuth } from "../../_providers/AuthProvider";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Home() {
   const [profile, setProfile] = useState<Profile>();
   const [backgroundImage, setBackgroundImage] = useState("");
   const [socialMediaUrl, setSocialMediaUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  if (!user && loading) {
+    router.push("/signin");
+    toast("Login to view page");
+  }
 
   useEffect(() => {
     const getProfile = async () => {
+      const id = user?.profile?.id;
       try {
-        const response = await api.get<Profile>("/profile");
+        const response = await api.get<Profile>(`/profile/${id}`);
         setProfile(response.data);
         setBackgroundImage(response.data.backgroundImage || "");
         setSocialMediaUrl(response.data.socialMediaUrl || "");
@@ -49,6 +59,15 @@ export default function Home() {
       <div>
         <div className="flex items-center justify-center h-64">
           <p>Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+  if (!user) {
+    return (
+      <div>
+        <div className="flex items-center justify-center h-64">
+          <p>Please log in to view your profile.</p>
         </div>
       </div>
     );

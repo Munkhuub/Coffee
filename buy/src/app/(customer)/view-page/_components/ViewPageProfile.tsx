@@ -11,7 +11,10 @@ const ViewPageProfile = () => {
       <div className="bg-white p-6 rounded-lg border border-[#F4F4F5]">
         <div className="flex justify-between items-center">
           <div className="flex gap-3 items-center">
-            <img className="size-12 rounded-full bg-black" />
+            <img
+              className="size-12 rounded-full bg-black"
+              src={user?.profile?.avatarImage}
+            />
             <h5 className="font-bold">{user?.profile?.name}</h5>
           </div>
           <Link href={"/account-settings"}>

@@ -20,7 +20,7 @@ export const UpdateCover = ({ defaultValue, onChange }: UpdateImageProps) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(
     defaultValue || null
   );
-  const fileInputRef = useRef<HTMLInputElement>(null); // 1️⃣ Add ref
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
