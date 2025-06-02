@@ -22,8 +22,8 @@ const AdminProfile = () => {
 
     const getProfile = async () => {
       try {
-        const userId = user?.profile?.id;
-        const response = await api.get<Profile>(`/profile/${userId}`);
+        const id = user?.profile?.id;
+        const response = await api.get<Profile>(`/profile/${id}`);
         setProfile(response.data);
         console.log("admin profile", response.data);
       } catch (error) {

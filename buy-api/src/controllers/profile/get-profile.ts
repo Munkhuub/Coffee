@@ -2,10 +2,15 @@ import { prisma } from "../../db";
 
 export const getProfileById = async (req, res) => {
   const { id } = req.params;
+  const profileId = Number(id);
+
+  if (isNaN(profileId)) {
+    return res.status(400).json({ message: "Invalid profile ID" });
+  }
 
   try {
     const profile = await prisma.profile.findUnique({
-      where: { id: Number(id) },
+      where: { id: profileId },
     });
 
     if (!profile) {

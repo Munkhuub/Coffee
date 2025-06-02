@@ -34,7 +34,7 @@ export const signin = async (req, res) => {
       return;
     }
 
-    const jwtSecret = process.env.JWT_SECRET;
+    const jwtSecret = process.env.JWT_SECRET || "Save1234";
     if (!jwtSecret) {
       console.error("JWT_SECRET not configured");
       res.status(500).json({ message: "Server configuration error" });
@@ -45,8 +45,7 @@ export const signin = async (req, res) => {
       {
         userId: user.id,
       },
-      jwtSecret,
-      { expiresIn: "24h" }
+      jwtSecret
     );
 
     const { password: _, ...userWithoutPassword } = user;

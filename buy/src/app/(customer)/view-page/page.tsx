@@ -14,18 +14,21 @@ export default function Home() {
   const [profile, setProfile] = useState<Profile>();
   const [backgroundImage, setBackgroundImage] = useState("");
   const [socialMediaUrl, setSocialMediaUrl] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  if (!user && loading) {
+  if (!user && !loading) {
     router.push("/signin");
     toast("Login to view page");
   }
 
   useEffect(() => {
     const getProfile = async () => {
-      const id = user?.profile?.id;
+      if (!user?.profile?.id) return; // Guard clause
+
+      setIsLoading(true); // Set loading to true when starting
+      const id = user.profile.id;
       try {
         const response = await api.get<Profile>(`/profile/${id}`);
         setProfile(response.data);
@@ -37,32 +40,41 @@ export default function Home() {
         setIsLoading(false);
       }
     };
-    getProfile();
-  }, []);
+
+    if (user && !loading) {
+      getProfile();
+    }
+  }, [user, loading]);
 
   const handleCoverChange = async (url: string) => {
+    // Immediately update the UI
     setBackgroundImage(url);
 
+    // Only make API call if user exists and URL is provided
+    if (!user?.profile?.id) {
+      console.error("No user profile ID available");
+      return;
+    }
+
     try {
-      const response = await api.post<Profile>("/profile", {
+      const response = await api.put<Profile>(`/profile/${user.profile.id}`, {
         backgroundImage: url,
       });
+
+      // Update the profile state with the response
       setProfile(response.data);
+
+      // Ensure backgroundImage state matches the saved value
+      setBackgroundImage(response.data.backgroundImage || "");
+
       console.log("Background image saved successfully");
     } catch (error) {
       console.error("Failed to save background image:", error);
+      // Revert the UI change if API call fails
+      setBackgroundImage(profile?.backgroundImage || "");
     }
   };
 
-  if (isLoading) {
-    return (
-      <div>
-        <div className="flex items-center justify-center h-64">
-          <p>Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
   if (!user) {
     return (
       <div>
