@@ -25,9 +25,9 @@ export default function Home() {
 
   useEffect(() => {
     const getProfile = async () => {
-      if (!user?.profile?.id) return; // Guard clause
+      if (!user?.profile?.id) return;
 
-      setIsLoading(true); // Set loading to true when starting
+      setIsLoading(true);
       const id = user.profile.id;
       try {
         const response = await api.get<Profile>(`/profile/${id}`);
@@ -47,10 +47,8 @@ export default function Home() {
   }, [user, loading]);
 
   const handleCoverChange = async (url: string) => {
-    // Immediately update the UI
     setBackgroundImage(url);
 
-    // Only make API call if user exists and URL is provided
     if (!user?.profile?.id) {
       console.error("No user profile ID available");
       return;
@@ -61,7 +59,6 @@ export default function Home() {
         backgroundImage: url,
       });
 
-      // Update the profile state with the response
       setProfile(response.data);
 
       // Ensure backgroundImage state matches the saved value

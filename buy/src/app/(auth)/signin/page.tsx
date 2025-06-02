@@ -35,7 +35,6 @@ export default function Home() {
         email: data.email,
         password: data.password,
       });
-      toast.success("Logged in successfully!");
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Login failed. Please check your credentials.");

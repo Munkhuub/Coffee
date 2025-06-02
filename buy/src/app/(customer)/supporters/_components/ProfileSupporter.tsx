@@ -4,7 +4,7 @@ import React from "react";
 import RecentSupporters from "./RecentSupporters";
 import Link from "next/link";
 
-const ViewPageProfile = () => {
+const ProfileSupporter = () => {
   const { user } = useAuth();
   return (
     <div className="w-[50%] flex flex-col gap-5">
@@ -31,4 +31,4 @@ const ViewPageProfile = () => {
   );
 };
 
-export default ViewPageProfile;
+export default ProfileSupporter;

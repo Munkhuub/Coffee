@@ -1,14 +1,12 @@
 "use client";
 
-import Header from "../_components/Header";
-import Donation from "./_components/Donation";
-import { UpdateCover } from "./_components/UpdateCover";
-import { useEffect, useId, useState } from "react";
-import ViewPageProfile from "./_components/ProfileSupporter";
+import { useEffect, useState } from "react";
+import ViewPageProfile from "../_components/ProfileSupporter";
 import { api } from "@/axios";
-import { Profile, useAuth } from "../../_providers/AuthProvider";
+import { Profile, useAuth } from "../../../_providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import DonationSupporter from "../_components/DonationSupporter";
 
 export default function Home() {
   const [profile, setProfile] = useState<Profile>();
@@ -24,10 +22,12 @@ export default function Home() {
   }
 
   useEffect(() => {
+    if (!user) return;
     const getProfile = async () => {
-      const id = user?.profile?.id;
+      setIsLoading(true);
+      const userId = user?.id;
       try {
-        const response = await api.get<Profile>(`/profile/${id}`);
+        const response = await api.get<Profile>(`/profile/${userId}`);
         setProfile(response.data);
         setBackgroundImage(response.data.backgroundImage || "");
         setSocialMediaUrl(response.data.socialMediaUrl || "");
@@ -38,7 +38,7 @@ export default function Home() {
       }
     };
     getProfile();
-  }, []);
+  }, [user]);
 
   return (
     <div className="mb-[187px]">
@@ -48,7 +48,7 @@ export default function Home() {
       />
       <div className="flex px-20 mt-[-85px] w-full   gap-5 relative z-10">
         <ViewPageProfile />
-        <Donation />
+        <DonationSupporter />
       </div>
     </div>
   );

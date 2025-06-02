@@ -55,7 +55,7 @@ export const signup: RequestHandler = async (req, res) => {
       },
     });
 
-    const jwtSecret = process.env.JWT_SECRET || "Save1234";
+    const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       console.error("JWT_SECRET environment variable is not set");
       res.status(500).json({ message: "Server configuration error" });

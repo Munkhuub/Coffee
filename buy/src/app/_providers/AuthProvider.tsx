@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       setUser(data.user);
 
       setAuthToken(data.token);
-
+      toast.success("Logged in successfully!");
       router.push("/createProfile");
     } catch (error) {
       console.error("Signin error:", error);
