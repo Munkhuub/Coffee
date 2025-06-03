@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ViewPageProfile from "../_components/ProfileSupporter";
 import { api } from "@/axios";
 import { Profile, useAuth } from "../../../_providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import DonationSupporter from "../_components/DonationSupporter";
+import ProfileSupporter from "../_components/ProfileSupporter";
 
 export default function Home() {
   const [profile, setProfile] = useState<Profile>();
@@ -16,10 +16,12 @@ export default function Home() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  if (!user && loading) {
-    router.push("/signin");
-    toast("Login to view page");
-  }
+  useEffect(() => {
+    if (!user && loading) {
+      router.push("/signin");
+      toast("Login to view page");
+    }
+  }, [user, loading, router]);
 
   useEffect(() => {
     if (!user) return;
@@ -40,6 +42,9 @@ export default function Home() {
     getProfile();
   }, [user]);
 
+  if (isLoading) {
+    return <div>Loading profile...</div>;
+  }
   return (
     <div className="mb-[187px]">
       <img
@@ -47,8 +52,8 @@ export default function Home() {
         src={profile?.backgroundImage}
       />
       <div className="flex px-20 mt-[-85px] w-full   gap-5 relative z-10">
-        <ViewPageProfile />
-        <DonationSupporter />
+        <ProfileSupporter profile={profile} />
+        <DonationSupporter profile={profile} />
       </div>
     </div>
   );

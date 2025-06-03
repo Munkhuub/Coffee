@@ -18,17 +18,17 @@ export default function Home() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  if (!user && !loading) {
+  if (!user && loading) {
     router.push("/signin");
     toast("Login to view page");
   }
 
   useEffect(() => {
     const getProfile = async () => {
-      if (!user?.profile?.id) return;
+      if (!user?.id) return;
 
       setIsLoading(true);
-      const id = user.profile.id;
+      const id = user?.id;
       try {
         const response = await api.get<Profile>(`/profile/${id}`);
         setProfile(response.data);

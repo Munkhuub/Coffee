@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  password  String
+  id            Int        @id @default(autoincrement())
+  email         String     @unique
+  password      String
   passwordChangedAt DateTime?
-  username  String @unique
-  profile   Profile?
-  bankCard  BankCard?
-  donations Donation[]
-  createdAt DateTime
-  updatedAt DateTime
+  username      String     @unique
+  profile       Profile?
+  bankCard      BankCard?
+  sentDonations Donation[] @relation("SentDonations")
+  receivedDonations Donation[] @relation("ReceivedDonations")
+  createdAt     DateTime
+  updatedAt     DateTime
 }
 
 
@@ -51,13 +52,14 @@ model BankCard {
 }
 
 model Donation {
-  id                      Int @id @default(autoincrement())
+  id                      Int      @id @default(autoincrement())
   amount                  Int
   specialMessage          String
   socialURLOrBuyMeACoffee String
   donorId                 Int
-  recipientId             Int @unique
-  recipient               User @relation(fields: [recipientId], references: [id])
+  recipientId             Int
+  donor                   User     @relation("SentDonations", fields: [donorId], references: [id])
+  recipient               User     @relation("ReceivedDonations", fields: [recipientId], references: [id])
   createdAt               DateTime
   updatedAt               DateTime
 }

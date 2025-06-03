@@ -16,7 +16,20 @@ export const signin = async (req, res) => {
       include: {
         profile: true,
         bankCard: true,
-        donations: true,
+        sentDonations: {
+          include: {
+            recipient: {
+              include: { profile: true },
+            },
+          },
+        },
+        receivedDonations: {
+          include: {
+            donor: {
+              include: { profile: true },
+            },
+          },
+        },
       },
     });
 

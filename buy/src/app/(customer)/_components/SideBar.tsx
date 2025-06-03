@@ -16,7 +16,6 @@ const SideBar = () => {
       path: "/view-page",
     },
     { name: "Account settings", icon: null, path: "/account-settings" },
-    { name: "Supporter page", icon: null, path: "/supporters" },
   ];
 
   const handleClick = (item: (typeof menuItems)[0]) => {

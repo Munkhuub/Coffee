@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { createDonationController } from "../controllers/donation/createDonationController";
-import { getDonation } from "../controllers/donation/get-donation";
+import { getDonationsByRecipient } from "../controllers/donation/getDonationsByRecipient";
 
 export const donationRouter = Router();
 
 donationRouter.post("/", createDonationController);
-donationRouter.get("/:userId", getDonation);
+donationRouter.get("/:userId", getDonationsByRecipient);

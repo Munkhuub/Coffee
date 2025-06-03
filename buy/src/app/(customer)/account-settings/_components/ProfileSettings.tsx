@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@radix-ui/react-label";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const profileSchema = z.object({
@@ -40,8 +41,8 @@ const ProfileSettings = () => {
     register,
     handleSubmit,
     setValue,
-    watch,
-    formState: { errors, isValid },
+    reset,
+    formState: { errors, isValid, dirtyFields },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     mode: "onChange",
@@ -53,6 +54,20 @@ const ProfileSettings = () => {
     },
   });
 
+  useEffect(() => {
+    if (user?.profile) {
+      const profileData = {
+        name: user.profile.name || "",
+        about: user.profile.about || "",
+        socialMediaUrl: user.profile.socialMediaUrl || "",
+        avatarImage: user.profile.avatarImage || "",
+      };
+
+      reset(profileData);
+      setProfile(user.profile);
+    }
+  }, [user?.profile, reset]);
+
   const onSubmit = async (data: ProfileFormData) => {
     setIsSubmitting(true);
     try {
@@ -63,20 +78,45 @@ const ProfileSettings = () => {
         throw new Error("Please log in to create a profile");
       }
 
-      console.log("Creating profile for user ID:", id);
+      console.log("Updating profile for user ID:", id);
 
-      const response = await api.put<ProfileType>(`/profile/${id}`, {
-        ...data,
-      });
+      const updateData: Partial<ProfileFormData> = {};
+
+      if (dirtyFields.name) {
+        updateData.name = data.name;
+      }
+
+      if (dirtyFields.about) {
+        updateData.about = data.about;
+      }
+
+      if (dirtyFields.socialMediaUrl) {
+        updateData.socialMediaUrl = data.socialMediaUrl;
+      }
+
+      if (dirtyFields.avatarImage) {
+        updateData.avatarImage = data.avatarImage;
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        console.log("No changes detected, skipping update");
+        return;
+      }
+
+      console.log("Sending update data:", updateData);
+
+      const response = await api.put<ProfileType>(`/profile/${id}`, updateData);
 
       setProfile(response.data);
       console.log("Profile updated:", response.data);
+      toast.success("Succesfully updated");
     } catch (err) {
       console.error("Error creating profile:", err);
     } finally {
       setIsSubmitting(false);
     }
   };
+
   return (
     <div className="text-[14px] w-[650px] flex flex-col gap-6 ">
       <p className="text-2xl font-semibold">My Profile</p>
@@ -90,7 +130,10 @@ const ProfileSettings = () => {
           <p>Add photo</p>
           <UpdateImage
             onChange={(url) =>
-              setValue("avatarImage", url, { shouldValidate: true })
+              setValue("avatarImage", url, {
+                shouldValidate: true,
+                shouldDirty: true,
+              })
             }
             defaultValue={user?.profile?.avatarImage}
           />

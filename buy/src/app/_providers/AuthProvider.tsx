@@ -37,6 +37,14 @@ export type Donation = {
   recipientId: number;
   createdAt: string;
   updatedAt: string;
+  donor?: {
+    id: number;
+    profile?: {
+      name?: string;
+      avatarImage?: string;
+      socialMediaUrl?: string;
+    };
+  };
 };
 
 export type User = {
@@ -83,7 +91,8 @@ const AuthContext = createContext({} as AuthContextType);
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const router = useRouter();
   const [user, setUser] = useState<User>();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start as true
+  const [initialized, setInitialized] = useState(false); // Track initialization
 
   const signIn = async ({
     email,
@@ -149,16 +158,25 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const initializeAuth = async () => {
+      console.log("Initializing auth...");
 
-    if (!token) return;
+      const token = localStorage.getItem("token");
+      console.log("Found token:", !!token);
 
-    setAuthToken(token);
+      if (!token) {
+        console.log("No token found, user not authenticated");
+        setLoading(false);
+        setInitialized(true);
+        return;
+      }
 
-    const getUser = async () => {
-      setLoading(true);
+      setAuthToken(token);
+
       try {
+        console.log("Validating token...");
         const { data } = await api.get<User>("/auth/getMe");
+        console.log("Token valid, user:", data);
         setUser(data);
       } catch (error) {
         console.error("Token validation failed:", error);
@@ -167,16 +185,22 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         setAuthToken("");
       } finally {
         setLoading(false);
+        setInitialized(true);
       }
     };
-    getUser();
+
+    initializeAuth();
   }, []);
+
+  if (!initialized) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <AuthContext.Provider
       value={{ user, signIn, signUp, signOut, loading, setUser }}
     >
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/axios";
-import { useAuth } from "@/app/_providers/AuthProvider";
+import { Profile, useAuth } from "@/app/_providers/AuthProvider";
 import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -28,9 +28,13 @@ const formSchema = z.object({
   }),
 });
 
+type DonationSupporterProps = {
+  profile?: Profile;
+};
+
 type FormValues = z.infer<typeof formSchema>;
 
-const DonationSupporter = () => {
+const DonationSupporter = ({ profile }: DonationSupporterProps) => {
   const [selectedAmount, setSelectedAmount] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<null | "success" | "error">(
@@ -56,7 +60,7 @@ const DonationSupporter = () => {
         ...values,
         amount: selectedAmount,
         donorId: user?.id,
-        recipientId: user?.profile?.id,
+        recipientId: profile?.userId,
       });
       console.log("Donation successful");
       setSubmitStatus("success");
@@ -77,9 +81,7 @@ const DonationSupporter = () => {
   return (
     <div className="w-[50%] bg-white p-6 rounded-lg border border-[#F4F4F5] flex flex-col gap-8">
       <div className="flex flex-col gap-6">
-        <h5 className="text-2xl font-semibold">
-          Buy {user?.profile?.name} a Coffee
-        </h5>
+        <h5 className="text-2xl font-semibold">Buy {profile?.name} a Coffee</h5>
         <div className="flex flex-col gap-2">
           <p>Select amount:</p>
           <div className="flex gap-3">

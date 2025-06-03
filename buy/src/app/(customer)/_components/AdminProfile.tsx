@@ -3,38 +3,57 @@ import { SelectDays } from "./SelectDays";
 import { Button } from "@/components/ui/button";
 import { CopyIcon } from "lucide-react";
 import { api } from "@/axios";
-import { response } from "express";
 import { Profile, useAuth } from "@/app/_providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const AdminProfile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading) return;
+
+    if (!user) {
       toast("Login to see Profile");
       router.push("/signin");
       return;
     }
 
+    if (!user.id) {
+      console.error("User object exists but has no id");
+      toast("Invalid user session. Please login again.");
+      router.push("/signin");
+      return;
+    }
+
     const getProfile = async () => {
+      setIsLoading(true);
       try {
-        const id = user?.profile?.id;
-        const response = await api.get<Profile>(`/profile/${id}`);
+        const response = await api.get<Profile>(`/profile/${user.id}`);
         setProfile(response.data);
+        console.log("res", response);
         console.log("admin profile", response.data);
       } catch (error) {
         console.error("Error fetching profile:", error);
-        toast("Failed to load profile.");
+        toast.error("Failed to load profile.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     getProfile();
-  }, [user, router]);
+  }, [user, loading, router]);
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isLoading) {
+    return <div>Loading profile...</div>;
+  }
   return (
     <div className="flex flex-col gap-3 border border-[#E4E4E7] p-6 rounded-lg">
       <div className="flex justify-between">
@@ -48,7 +67,14 @@ const AdminProfile = () => {
             <p className="text-[14px]">buymeacoffee.com/baconpancakes1</p>
           </div>
         </div>
-        <Button className="flex gap-2">
+        <Button
+          className="flex gap-2"
+          onClick={() => {
+            const link = `http://localhost:3000/supporters/${user?.id}`;
+            navigator.clipboard.writeText(link);
+            toast.success("Link copied to clipboard!");
+          }}
+        >
           <CopyIcon />
           <p>Share page link</p>
         </Button>

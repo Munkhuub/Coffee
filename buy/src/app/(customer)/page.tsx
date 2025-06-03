@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div className="w-full flex">
       <SideBar />
-      <div className="flex flex-col gap-8 pt-11 pl-20">
+      <div className="flex flex-col gap-8 pt-11 pl-20 w-full">
         <AdminProfile />
         <Transactions />
       </div>

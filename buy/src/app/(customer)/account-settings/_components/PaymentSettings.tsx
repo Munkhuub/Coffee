@@ -3,60 +3,109 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { z } from "zod";
 import { api } from "@/axios";
 import { useForm } from "react-hook-form";
 import { BankCard, useAuth } from "@/app/_providers/AuthProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { ExpiryMonth } from "@/app/(auth)/createProfile/_components/ExpiryMonth";
 import { ExpiryYear } from "@/app/(auth)/createProfile/_components/ExpiryYear";
 import { bankCardSchema } from "@/app/(auth)/createProfile/_components/Payment";
 import SelectCountrySettings from "./SelectCountrySettings";
+import { toast } from "sonner";
 
 type BankCardFormData = z.infer<typeof bankCardSchema>;
 
 const PaymentSettings = () => {
-  const [bankCard, setBankCard] = useState<BankCard | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useAuth();
-  const Router = useRouter();
+  const { user, setUser } = useAuth();
+
   const {
     register,
     handleSubmit,
     setValue,
-    formState: { errors, isValid },
+    reset,
+    formState: { errors, isValid, dirtyFields },
   } = useForm<BankCardFormData>({
     resolver: zodResolver(bankCardSchema),
     mode: "onChange",
     defaultValues: {
-      firstname: user?.bankCard?.firstname,
-      lastname: user?.bankCard?.lastname,
+      firstname: "",
+      lastname: "",
       cardNumber: "",
       cvc: "",
       expiryMonth: "",
       expiryYear: "",
-      country: user?.bankCard?.country,
+      country: "",
     },
   });
 
+  useEffect(() => {
+    if (user?.bankCard) {
+      const bankCardData = {
+        firstname: user.bankCard.firstname || "",
+        lastname: user.bankCard.lastname || "",
+        cardNumber: "",
+        cvc: "",
+        expiryMonth: "",
+        expiryYear: "",
+        country: user.bankCard.country || "",
+      };
+
+      reset(bankCardData);
+    }
+  }, [user?.bankCard, reset]);
+
   const handleComplete = async (data: BankCardFormData) => {
     setIsSubmitting(true);
-    const { expiryMonth, expiryYear, ...dataWithoutExpiryDate } = data;
 
     try {
-      const id = user?.bankCard?.id;
-      const expiryDate = `${expiryMonth}/${expiryYear.slice(-2)}`;
-      const response = await api.put<BankCard>(`/bankCard/${id}`, {
-        ...dataWithoutExpiryDate,
-        expiryDate,
-      });
+      if (!user?.bankCard?.id) {
+        throw new Error("Bank card not found. Please create one first.");
+      }
 
-      setBankCard(response.data);
-      console.log("Bank Card created:", response.data);
+      const updateData: Partial<any> = {};
+
+      if (dirtyFields.firstname) updateData.firstname = data.firstname;
+      if (dirtyFields.lastname) updateData.lastname = data.lastname;
+      if (dirtyFields.country) updateData.country = data.country;
+
+      if (data.cardNumber) updateData.cardNumber = data.cardNumber;
+      if (data.cvc) updateData.cvc = data.cvc;
+
+      if (data.expiryMonth && data.expiryYear) {
+        updateData.expiryDate = `${data.expiryMonth}/${data.expiryYear.slice(
+          -2
+        )}`;
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        toast.info("No changes detected");
+        return;
+      }
+
+      console.log("Updating bank card with:", updateData);
+
+      const response = await api.put<BankCard>(
+        `/bankCard/${user.bankCard.id}`,
+        updateData
+      );
+
+      if (user) {
+        setUser({
+          ...user,
+          bankCard: response.data,
+        });
+      }
+
+      toast.success("Payment information updated successfully!");
+      console.log("Bank Card updated:", response.data);
     } catch (error) {
-      console.error("Error creating bank card:", error);
+      console.error("Error updating bank card:", error);
+      toast.error("Failed to update payment information");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -70,7 +119,9 @@ const PaymentSettings = () => {
         <div className="w-full flex flex-col gap-2">
           <Label htmlFor="country">Select Country</Label>
           <SelectCountrySettings
-            onValueChange={(value) => setValue("country", value)}
+            onValueChange={(value) =>
+              setValue("country", value, { shouldDirty: true })
+            }
             error={errors.country?.message}
             value={user?.bankCard?.country}
           />
@@ -126,14 +177,18 @@ const PaymentSettings = () => {
           <div className="flex flex-col gap-2 flex-1">
             <Label htmlFor="expiryMonth">Expiry month</Label>
             <ExpiryMonth
-              onValueChange={(value) => setValue("expiryMonth", value)}
+              onValueChange={(value) =>
+                setValue("expiryMonth", value, { shouldDirty: true })
+              }
               error={errors.expiryMonth?.message}
             />
           </div>
           <div className="flex flex-col gap-2 flex-1">
             <Label htmlFor="expiryYear">Expiry year</Label>
             <ExpiryYear
-              onValueChange={(value) => setValue("expiryYear", value)}
+              onValueChange={(value) =>
+                setValue("expiryYear", value, { shouldDirty: true })
+              }
               error={errors.expiryYear?.message}
             />
           </div>
