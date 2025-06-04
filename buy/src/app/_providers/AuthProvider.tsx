@@ -50,10 +50,13 @@ export type Donation = {
 export type User = {
   id: number;
   email: string;
+  password: string;
+  passwordChangedAt?: string | null;
   username: string;
-  profile?: Profile;
-  bankCard?: BankCard;
-  donations: Donation[];
+  profile?: Profile | null;
+  bankCard?: BankCard | null;
+  sentDonations?: Donation[];
+  receivedDonations?: Donation[];
   createdAt: string;
   updatedAt: string;
 };

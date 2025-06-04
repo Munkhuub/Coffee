@@ -12,6 +12,8 @@ const AdminProfile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { user, loading } = useAuth();
+  const [selectedDays, setSelectedDays] = useState("30");
+  const [earnings, setEarnings] = useState(0);
 
   useEffect(() => {
     if (loading) return;
@@ -47,12 +49,43 @@ const AdminProfile = () => {
     getProfile();
   }, [user, loading, router]);
 
+  useEffect(() => {
+    if (!user?.receivedDonations) return;
+
+    const now = new Date();
+
+    const filteredDonations = user.receivedDonations.filter((donation) => {
+      if (selectedDays === "all") return true;
+
+      const createdAt = new Date(donation.createdAt);
+      const daysDiff =
+        (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+
+      return daysDiff <= Number(selectedDays);
+    });
+
+    const total = filteredDonations.reduce(
+      (sum, donation) => sum + donation.amount,
+      0
+    );
+
+    setEarnings(total);
+  }, [selectedDays, user?.receivedDonations]);
+
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   if (isLoading) {
-    return <div>Loading profile...</div>;
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        Loading profile...
+      </div>
+    );
   }
   return (
     <div className="flex flex-col gap-3 border border-[#E4E4E7] p-6 rounded-lg">
@@ -83,9 +116,9 @@ const AdminProfile = () => {
       <div className="flex flex-col gap-6">
         <div className="flex gap-4 items-center">
           <h3 className="text-xl font-semibold">Earnings</h3>
-          <SelectDays />
+          <SelectDays selectedDays={selectedDays} onChange={setSelectedDays} />
         </div>
-        <p className="text-4xl font-bold">$450</p>
+        <p className="text-4xl font-bold">${earnings}</p>
       </div>
     </div>
   );

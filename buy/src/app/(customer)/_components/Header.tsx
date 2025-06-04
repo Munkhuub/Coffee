@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
 import { CoffeeIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { HeaderLogOut } from "./HeaderLogOut";
 
 const Header = () => {
   return (
@@ -13,7 +13,7 @@ const Header = () => {
         </div>
       </Link>
 
-      <Button className="bg-[#F4F4F5] text-black h-10">Log out</Button>
+      <HeaderLogOut />
     </div>
   );
 };
