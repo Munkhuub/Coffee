@@ -7,6 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 const Transactions = () => {
   const [supporters, setSupporters] = useState<Donation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [amountFilter, setAmountFilter] = useState<number[] | null>(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -32,11 +33,18 @@ const Transactions = () => {
     getDonations();
   }, [user?.id]);
 
+  const filteredSupporters =
+    amountFilter && amountFilter.length > 0
+      ? supporters.filter((d) => amountFilter.includes(d.amount))
+      : supporters;
   return (
     <div className="flex flex-col gap-3">
       <div className="flex justify-between">
         <h5 className="font-semibold">Recent transactions</h5>
-        <SelectAmount />
+        <SelectAmount
+          onChange={(value: number[]) => setAmountFilter(value)}
+          value={amountFilter ?? []}
+        />
       </div>
 
       {isLoading ? (
@@ -44,7 +52,7 @@ const Transactions = () => {
       ) : supporters.length === 0 ? (
         <p>No donations yet.</p>
       ) : (
-        supporters.map((supporter) => (
+        filteredSupporters.map((supporter) => (
           <div
             key={supporter.id}
             className="border border-[#E4E4E7] p-6 rounded-lg"

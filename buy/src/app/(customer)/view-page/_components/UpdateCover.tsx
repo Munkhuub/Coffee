@@ -121,7 +121,6 @@ export const UpdateCover = ({ defaultValue, onChange }: UpdateImageProps) => {
             className="w-full h-full object-cover"
             alt="Profile preview"
             onError={(e) => {
-              // Fallback if image fails to load
               console.error("Image failed to load:", previewUrl);
               setPreviewUrl(null);
             }}
