@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import HeartIcon from "./assets/HeartIcon";
 import { api } from "@/axios";
-import { Donation, Profile, useAuth } from "@/app/_providers/AuthProvider";
+import { Donation, Profile } from "@/app/_providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { CircleChevronDown, CircleChevronUp } from "lucide-react";
+
 type RecentSupporterProps = {
   profile?: Profile;
 };
@@ -12,7 +13,6 @@ const RecentSupporters = ({ profile }: RecentSupporterProps) => {
   const [supporters, setSupporters] = useState<Donation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showAll, setShowAll] = useState(false);
-  const { user } = useAuth();
 
   useEffect(() => {
     if (!profile?.userId) {
@@ -51,8 +51,20 @@ const RecentSupporters = ({ profile }: RecentSupporterProps) => {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="bg-white p-6 rounded-lg border border-[#F4F4F5] flex flex-col gap-3">
+        <h5 className="font-semibold">Recent Supporters</h5>
+        <div className="h-[140px] w-full flex justify-center items-center">
+          Loading supporters...
+        </div>
+      </div>
+    );
+  }
+
   const displayedSupporters = showAll ? supporters : supporters.slice(0, 1);
   const hasMoreSupporters = supporters.length > 1;
+
   return (
     <div className="bg-white p-6 rounded-lg border border-[#F4F4F5] flex flex-col gap-3">
       <h5 className="font-semibold">Recent Supporters</h5>
@@ -64,22 +76,35 @@ const RecentSupporters = ({ profile }: RecentSupporterProps) => {
               key={donation.id}
               className="max-h-[52px] flex items-center gap-4"
             >
-              <img
-                src={user?.profile?.avatarImage}
-                className="size-10 rounded-full"
-              />
+              {donation.donor?.profile?.avatarImage ? (
+                <img
+                  src={donation.donor.profile.avatarImage}
+                  className="size-10 rounded-full object-cover"
+                  alt={`${donation.donor.profile.name} avatar`}
+                />
+              ) : (
+                <div className="size-10 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {donation.donor?.profile?.name?.charAt(0).toUpperCase() ||
+                      "?"}
+                  </span>
+                </div>
+              )}
+
               <div>
                 <div className="flex gap-1">
                   <p className="font-semibold">
-                    {user?.profile?.name || "Anonymous"}
+                    {donation.donor?.profile?.name || "Anonymous"}
                   </p>
                   <p>bought ${donation?.amount}</p>
                 </div>
-
-                <p>{donation?.specialMessage || "Anonymous supporter"}</p>
+                <p className="text-sm text-gray-600">
+                  {donation?.specialMessage || "Thanks for the support!"}
+                </p>
               </div>
             </div>
           ))}
+
           {hasMoreSupporters && (
             <Button
               variant="ghost"
@@ -98,7 +123,9 @@ const RecentSupporters = ({ profile }: RecentSupporterProps) => {
       ) : (
         <div className="h-[140px] w-full flex flex-col gap-1 justify-center items-center border border-[#F4F4F5] rounded-lg">
           <HeartIcon />
-          <p className="font-semibold">Be the first one to support Jake</p>
+          <p className="font-semibold">
+            Be the first one to support {profile.name}
+          </p>
         </div>
       )}
     </div>

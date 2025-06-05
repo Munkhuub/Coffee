@@ -48,9 +48,11 @@ const Transactions = () => {
       </div>
 
       {isLoading ? (
-        <p>Loading...</p>
+        <p className="flex items-center justify-center">Loading...</p>
       ) : supporters.length === 0 ? (
-        <p>No donations yet.</p>
+        <p className="flex items-center justify-center py-20">
+          No donations yet.
+        </p>
       ) : (
         filteredSupporters.map((supporter) => (
           <div

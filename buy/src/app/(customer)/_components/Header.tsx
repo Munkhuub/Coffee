@@ -5,7 +5,7 @@ import { HeaderLogOut } from "./HeaderLogOut";
 
 const Header = () => {
   return (
-    <div className="flex justify-between items-center px-20 py-2">
+    <div className="flex justify-between items-center px-20 py-3">
       <Link href={"/"}>
         <div className="flex items-center gap-2">
           <CoffeeIcon className="size-5" />

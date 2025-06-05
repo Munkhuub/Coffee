@@ -22,14 +22,16 @@ export function HeaderLogOut() {
       }}
     >
       <SelectTrigger className="w-[180px] border-none shadow-none">
-        <div className="flex gap-2 items-center">
-          <img src={user?.profile?.avatarImage} className="size-10 rounded" />
+        <div className="flex gap-3 items-center">
+          <img
+            src={user?.profile?.avatarImage}
+            className="size-6 rounded-full"
+          />
           <p className="text-black">{user?.profile?.name}</p>
         </div>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="flex items-center">
         <SelectGroup>
-          <SelectLabel>Fruits</SelectLabel>
           <SelectItem value="logout">Log out</SelectItem>
         </SelectGroup>
       </SelectContent>
