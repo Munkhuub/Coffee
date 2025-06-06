@@ -18,11 +18,6 @@ export const Step1 = () => {
   return (
     <div className="flex gap-12 p-5 w-[50%] h-screen justify-center items-center">
       <form className="w-[407px] flex flex-col gap-6" onSubmit={onSubmit}>
-        <Link href="/">
-          <Button variant="outline" size="icon">
-            <ChevronLeft />
-          </Button>
-        </Link>
         <div>
           <h3 className="text-2xl font-semibold">Create your account</h3>
           <p className="text-[#71717A] text-[14px]">

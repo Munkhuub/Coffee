@@ -3,7 +3,7 @@ import React from "react";
 
 const Banner = () => {
   return (
-    <div className="w-[50%] bg-[#FBBF24] h-screen px-20">
+    <div className="w-[50%] bg-[#FBBF24] min-h-screen px-20">
       <div className="flex items-center gap-2 mt-8">
         <CoffeeIcon className="size-5" />
         <p className="text-xl font-bold">Buy Me Coffee</p>

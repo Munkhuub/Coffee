@@ -1,9 +1,7 @@
 "use client";
 
-import { FormProvider, loginSchema, useFormContext } from "../FormProvider";
-
+import { loginSchema } from "../FormProvider";
 import Banner from "../signup/_components/Banner";
-
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
@@ -46,6 +44,11 @@ export default function Home() {
   return (
     <div className="lg:w-[1440px] m-auto relative flex">
       <Banner />
+      <Link href="/signup">
+        <Button variant="secondary" className="absolute top-8 right-20">
+          Sign Up
+        </Button>
+      </Link>
       <div className="flex gap-12 p-5 w-[50%] h-screen justify-center">
         <form
           className="w-[407px] mt-[246px] ml-20 flex flex-col gap-6"
@@ -55,32 +58,39 @@ export default function Home() {
             <h3 className="text-2xl font-semibold">Welcome Back</h3>
           </div>
           <div className="flex flex-col gap-4">
-            <div className="w-full h-9 px-3 py-2 border-[1px] border-[#E4E4E7] rounded-md">
-              <input
-                type="email"
-                placeholder="Enter your mail address"
-                className="h-5 flex items-center text-[14px] w-full border-none"
-                {...register("email")}
-              />
-            </div>
-            {formState.errors.email && (
-              <div className="text-[#E14942] text-[14px]">
-                {formState.errors.email.message}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Email</label>
+              <div className="w-full h-9 px-3 py-2 border-[1px] border-[#E4E4E7] rounded-md">
+                <input
+                  type="email"
+                  placeholder="Enter your mail address"
+                  className="h-5 flex items-center text-[14px] w-full border-none outline-none"
+                  {...register("email")}
+                />
               </div>
-            )}
-            <div className="w-full h-9 px-3 py-2 border-[1px] border-[#E4E4E7] rounded-md">
-              <input
-                type="password"
-                placeholder="Password"
-                className="h-5 flex items-center text-[14px] w-full border-none"
-                {...register("password")}
-              />
+              {formState.errors.email && (
+                <div className="text-[#E14942] text-[14px]">
+                  {formState.errors.email.message}
+                </div>
+              )}
             </div>
-            {formState.errors.password && (
-              <div className="text-[#E14942] text-[14px]">
-                {formState.errors.password.message}
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Password</label>
+              <div className="w-full h-9 px-3 py-2 border-[1px] border-[#E4E4E7] rounded-md">
+                <input
+                  type="password"
+                  placeholder="Password"
+                  className="h-5 flex items-center text-[14px] w-full border-none outline-none"
+                  {...register("password")}
+                />
               </div>
-            )}
+              {formState.errors.password && (
+                <div className="text-[#E14942] text-[14px]">
+                  {formState.errors.password.message}
+                </div>
+              )}
+            </div>
           </div>
           <Button
             className={`w-full transition-none hover:bg-black hover:text-black ${
@@ -93,15 +103,6 @@ export default function Home() {
           >
             {isSubmitting ? "Logging In..." : "Continue"}
           </Button>
-
-          <div className="w-full flex justify-center">
-            <div className="flex gap-3">
-              <p className="text-[#71717A]">Don't have an account?</p>
-              <Link href="/signup" className="text-[#2563EB]">
-                Sign up
-              </Link>
-            </div>
-          </div>
         </form>
       </div>
     </div>
