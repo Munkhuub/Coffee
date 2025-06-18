@@ -196,7 +196,11 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   if (!initialized) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex w-full p-100 items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   return (

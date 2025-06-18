@@ -8,6 +8,7 @@ import ProfileSettings from "./_components/ProfileSettings";
 
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import SuccessMessage from "./_components/SuccessMessage";
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -24,6 +25,7 @@ export default function Home() {
         <ProfileSettings />
         <ChangePassword />
         <PaymentSettings />
+        <SuccessMessage />
       </div>
     </div>
   );

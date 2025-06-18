@@ -25,7 +25,7 @@ export function HeaderLogOut() {
         <div className="flex gap-3 items-center">
           <img
             src={user?.profile?.avatarImage}
-            className="size-6 rounded-full"
+            className="size-6 rounded-full object-cover"
           />
           <p className="text-black">{user?.profile?.name}</p>
         </div>

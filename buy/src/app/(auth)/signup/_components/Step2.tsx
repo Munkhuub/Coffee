@@ -11,7 +11,6 @@ export const Step2 = () => {
   const {
     prevStep,
     emailPasswordForm,
-    updateFormValues,
     formValues,
     handleSubmit,
     isSubmitting,

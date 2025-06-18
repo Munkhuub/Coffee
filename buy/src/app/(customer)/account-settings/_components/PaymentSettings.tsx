@@ -209,7 +209,7 @@ const PaymentSettings = () => {
 
       <div className="flex gap-4 justify-end">
         <Button
-          className="w-[246px]"
+          className="w-full"
           disabled={isSubmitting || !isValid}
           type="submit"
         >
