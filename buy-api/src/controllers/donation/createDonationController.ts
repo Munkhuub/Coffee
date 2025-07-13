@@ -1,6 +1,7 @@
 import { prisma } from "../../db";
+import { Request, Response } from "express";
 
-export const createDonationController = async (req, res) => {
+export const createDonationController = async (req: Request, res: Response) => {
   const {
     amount,
     specialMessage,

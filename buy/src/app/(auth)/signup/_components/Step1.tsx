@@ -1,12 +1,9 @@
-"use client";
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "../../FormProvider";
 
 export const Step1 = () => {
   const { nextStep, usernameForm, updateFormValues } = useFormContext();
-
   const { register, handleSubmit, formState } = usernameForm;
 
   const onSubmit = handleSubmit((data) => {
@@ -15,47 +12,44 @@ export const Step1 = () => {
   });
 
   return (
-    <div className="flex gap-12 p-5 w-[50%] h-screen justify-center items-center">
-      <form className="w-[407px] flex flex-col gap-6" onSubmit={onSubmit}>
+    <div className="w-full md:w-[50%] p-4 sm:p-6 lg:p-8 flex justify-center md:items-center mt-16">
+      <form className="w-full max-w-md flex flex-col gap-6" onSubmit={onSubmit}>
         <div>
           <h3 className="text-2xl font-semibold">Create your account</h3>
-          <p className="text-[#71717A] text-[14px]">
+          <p className="text-gray-500 text-sm">
             Choose a username for your page
           </p>
         </div>
+
         <div>
-          <div className="w-full h-9 px-3 py-2 border-[1px] border-[#E4E4E7] rounded-md">
+          <div className="w-full h-10 px-4 py-3 border border-gray-200 rounded-lg flex items-center">
             <input
               type="text"
               placeholder="Enter username here"
-              className="h-5 flex items-center text-[14px] w-full border-none"
+              className="h-full w-full border-none text-base focus:outline-none"
               {...register("username")}
             />
           </div>
           {formState.errors.username && (
-            <div className="text-[#E14942] text-[14px]">
+            <div className="text-red-500 text-sm mt-1">
               {formState.errors.username.message}
             </div>
           )}
         </div>
 
         <Button
-          className={`w-full transition-none hover:bg-black hover:text-white ${
-            formState.isValid
-              ? "bg-black text-white"
-              : "bg-[#d1d1d1] text-black hover:bg-[#d1d1d1] hover:text-black"
-          }`}
+          className="w-full h-10 text-base"
           type="submit"
+          disabled={!formState.isValid}
         >
           Continue
         </Button>
-        <div className="w-full flex justify-center">
-          <div className="flex gap-3">
-            <p className="text-[#71717A]">Already have an account?</p>
-            <Link href="/login" className="text-[#2563EB]">
-              Log in
-            </Link>
-          </div>
+
+        <div className="text-center text-sm text-gray-500">
+          Already have an account?
+          <Link href="/signin" className="text-blue-600 hover:underline">
+            Log in
+          </Link>
         </div>
       </form>
     </div>

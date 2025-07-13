@@ -1,18 +1,18 @@
-"use client";
-
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/app/_providers/AuthProvider";
 
 export function HeaderLogOut() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading } = useAuth();
+  if (loading) {
+    return null;
+  }
+  console.log(user?.profile?.avatarImage);
   return (
     <Select
       onValueChange={(value) => {
@@ -22,9 +22,10 @@ export function HeaderLogOut() {
       }}
     >
       <SelectTrigger className="w-[180px] border-none shadow-none">
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-2 md:gap-3 items-center">
           <img
-            src={user?.profile?.avatarImage}
+            src={user?.profile?.avatarImage || `default-avatar.png`}
+            alt={`${user?.profile?.name}'s profile picture`}
             className="size-6 rounded-full object-cover"
           />
           <p className="text-black">{user?.profile?.name}</p>

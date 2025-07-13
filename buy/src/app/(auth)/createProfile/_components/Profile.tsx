@@ -45,7 +45,7 @@ export type ProfileType = {
 };
 
 const Profile = () => {
-  const { nextStep, updateFormValues, step } = useFormContext();
+  const { nextStep, updateFormValues } = useFormContext();
   const { user, loading } = useAuth();
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,7 +80,7 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="text-[14px] w-[510px] flex flex-col gap-6">
+      <div className="text-[14px] w-full max-w-[510px] px-4 mx-auto flex flex-col gap-6">
         <p className="text-2xl font-semibold">Loading...</p>
       </div>
     );
@@ -88,7 +88,7 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <div className="text-[14px] w-[510px] flex flex-col gap-6">
+      <div className="text-[14px] w-full max-w-[510px] px-4 mx-auto flex flex-col gap-6">
         <p className="text-2xl font-semibold">Please log in to continue</p>
       </div>
     );
@@ -133,8 +133,8 @@ const Profile = () => {
   };
 
   return (
-    <div>
-      <div className="text-[14px] w-[510px] flex flex-col gap-6">
+    <div className="px-4 w-full">
+      <div className="text-[14px] w-full max-w-[510px] mx-auto flex flex-col gap-6">
         <p className="text-2xl font-semibold">Complete your profile page</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
@@ -195,10 +195,10 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex justify-end">
             <Button
               type="submit"
-              className="w-[246px] ml-auto"
+              className="w-full sm:w-[246px]"
               disabled={isSubmitting || !isValid || !user?.id}
             >
               {isSubmitting

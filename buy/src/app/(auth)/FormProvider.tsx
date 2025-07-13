@@ -7,6 +7,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useAuth } from "../_providers/AuthProvider";
 
+interface errorMessage {
+  response?: {
+    data?: {
+      error?: string;
+    };
+  };
+  message?: string;
+}
+function isErrorWithMessage(err: unknown): err is errorMessage {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    "response" in err &&
+    typeof err.response === "object"
+  );
+}
+
 export const loginSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -129,7 +146,27 @@ export const FormProvider = ({ children }: FormProviderProps) => {
       toast.success("Account created successfully!");
     } catch (error) {
       console.error("Signup error:", error);
-      toast.error("Signup failed");
+
+      if (isErrorWithMessage(error) && error.response?.data?.error) {
+        const errorMessage = error.response.data.error;
+
+        if (errorMessage.includes("Username")) {
+          usernameForm.setError("username", {
+            type: "manual",
+            message: errorMessage,
+          });
+          setStep(0);
+        } else if (errorMessage.includes("Email")) {
+          emailPasswordForm.setError("email", {
+            type: "manual",
+            message: errorMessage,
+          });
+        }
+
+        toast.error(errorMessage);
+      } else {
+        toast.error("Signup failed");
+      }
     } finally {
       setIsSubmitting(false);
     }

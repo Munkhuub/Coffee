@@ -2,13 +2,9 @@ import React from "react";
 import {
   Select,
   SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { number } from "zod";
 import { Checkbox } from "@/components/ui/checkbox";
 
 type SelectAmountProps = {

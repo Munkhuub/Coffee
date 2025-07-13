@@ -1,6 +1,7 @@
 import { prisma } from "../../db";
+import { Request, Response } from "express";
 
-export const getProfileById = async (req, res) => {
+export const getProfileById = async (req: Request, res: Response) => {
   const userId = parseInt(req.params.userId, 10);
 
   if (isNaN(userId)) {

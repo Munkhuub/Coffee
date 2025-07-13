@@ -1,6 +1,7 @@
 import { prisma } from "../../db";
+import { Request, Response } from "express";
 
-const createBankCardController = async (req, res) => {
+const createBankCardController = async (req: Request, res: Response) => {
   const { country, firstname, lastname, cardNumber, expiryDate, userId, cvc } =
     req.body;
 

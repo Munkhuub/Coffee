@@ -1,6 +1,7 @@
 import { prisma } from "../../db";
+import { Request, Response } from "express";
 
-export const updateProfileById = async (req, res) => {
+export const updateProfileById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const {
     name,
@@ -29,10 +30,27 @@ export const updateProfileById = async (req, res) => {
   } catch (error) {
     console.error("Error updating user:", error);
 
-    if (error.code === "P2002" && error.meta?.target?.includes("email")) {
-      return res.status(400).json({ message: "This email is already in use." });
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      "meta" in error
+    ) {
+      const prismaError = error as {
+        code: string;
+        meta?: { target?: string[] };
+      };
+
+      if (
+        prismaError.code === "P2002" &&
+        prismaError.meta?.target?.includes("email")
+      ) {
+        return res
+          .status(400)
+          .json({ message: "This email is already in use." });
+      }
     }
 
-    res.status(500).json({ message: "Server error", error });
+    return res.status(500).json({ message: "Server error", error });
   }
 };

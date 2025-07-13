@@ -1,7 +1,7 @@
-import path from "node:path";
+import { join } from "node:path";
 import type { PrismaConfig } from "prisma";
 
 export default {
   earlyAccess: true,
-  schema: path.join(`prisma`, `schema.prisma`),
+  schema: join("prisma", "schema.prisma"),
 } satisfies PrismaConfig;

@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +14,24 @@ import SelectCountrySettings from "./SelectCountrySettings";
 import { toast } from "sonner";
 
 type BankCardFormData = z.infer<typeof bankCardSchema>;
+
+interface BankCardUpdateData {
+  firstname?: string;
+  lastname?: string;
+  country?: string;
+  cardNumber?: string;
+  cvc?: string;
+  expiryDate?: string;
+}
+
+interface ApiError {
+  response?: {
+    data?: {
+      error?: string;
+    };
+  };
+  message?: string;
+}
 
 const PaymentSettings = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,7 +59,7 @@ const PaymentSettings = () => {
 
   useEffect(() => {
     if (user?.bankCard) {
-      const bankCardData = {
+      const bankCardData: BankCardFormData = {
         firstname: user.bankCard.firstname || "",
         lastname: user.bankCard.lastname || "",
         cardNumber: "",
@@ -65,7 +81,7 @@ const PaymentSettings = () => {
         throw new Error("Bank card not found. Please create one first.");
       }
 
-      const updateData: Partial<any> = {};
+      const updateData: BankCardUpdateData = {};
 
       if (dirtyFields.firstname) updateData.firstname = data.firstname;
       if (dirtyFields.lastname) updateData.lastname = data.lastname;
@@ -103,120 +119,153 @@ const PaymentSettings = () => {
       console.log("Bank Card updated:", response.data);
     } catch (error) {
       console.error("Error updating bank card:", error);
-      toast.error("Failed to update payment information");
+
+      const apiError = error as ApiError;
+      const errorMessage =
+        apiError?.response?.data?.error ||
+        apiError?.message ||
+        "Failed to update payment information";
+
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form
-      className="text-[14px] w-[650px] flex flex-col gap-6  rounded-lg border border-[#E4E4E7] p-6"
-      onSubmit={handleSubmit(handleComplete)}
-    >
-      <p className="text-2xl font-semibold">Payment Information</p>
-      <div className="flex flex-col gap-3 w-full text-[14px]">
-        <div className="w-full flex flex-col gap-2">
-          <Label htmlFor="country">Select Country</Label>
-          <SelectCountrySettings
-            onValueChange={(value) =>
-              setValue("country", value, { shouldDirty: true })
-            }
-            error={errors.country?.message}
-            value={user?.bankCard?.country}
-          />
-        </div>
+    <div className="w-full max-w-none sm:max-w-[650px] mx-auto px-4 sm:px-0">
+      <form
+        className="text-sm sm:text-base w-full flex flex-col gap-4 sm:gap-6 rounded-lg border border-[#E4E4E7] p-4 sm:p-6"
+        onSubmit={handleSubmit(handleComplete)}
+      >
+        <h2 className="text-xl sm:text-2xl font-semibold text-center sm:text-left">
+          Payment Information
+        </h2>
 
-        <div className="flex gap-3 w-full">
+        <div className="flex flex-col gap-4 sm:gap-6 w-full">
           <div className="w-full flex flex-col gap-2">
-            <Label htmlFor="firstName">First Name</Label>
-            <Input
-              id="firstname"
-              type="text"
-              placeholder="Enter your name here"
-              {...register("firstname")}
+            <Label htmlFor="country" className="text-sm sm:text-base">
+              Select Country
+            </Label>
+            <SelectCountrySettings
+              onValueChange={(value: string) =>
+                setValue("country", value, { shouldDirty: true })
+              }
+              error={errors.country?.message}
+              value={user?.bankCard?.country}
             />
-            {errors.firstname && (
-              <span className="text-red-500 text-sm">
-                {errors.firstname.message}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
+            <div className="w-full flex flex-col gap-2">
+              <Label htmlFor="firstName" className="text-sm sm:text-base">
+                First Name
+              </Label>
+              <Input
+                id="firstname"
+                type="text"
+                placeholder="Enter your name here"
+                className="h-10 sm:h-11 text-sm sm:text-base"
+                {...register("firstname")}
+              />
+              {errors.firstname && (
+                <span className="text-red-500 text-xs sm:text-sm">
+                  {errors.firstname.message}
+                </span>
+              )}
+            </div>
+            <div className="w-full flex flex-col gap-2">
+              <Label htmlFor="lastName" className="text-sm sm:text-base">
+                Last Name
+              </Label>
+              <Input
+                id="lastname"
+                type="text"
+                placeholder="Enter your last name here"
+                className="h-10 sm:h-11 text-sm sm:text-base"
+                {...register("lastname")}
+              />
+              {errors.lastname && (
+                <span className="text-red-500 text-xs sm:text-sm">
+                  {errors.lastname.message}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="cardNumber" className="text-sm sm:text-base">
+              Card Number
+            </Label>
+            <Input
+              id="cardNumber"
+              type="text"
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              className="h-10 sm:h-11 text-sm sm:text-base"
+              {...register("cardNumber")}
+            />
+            {errors.cardNumber && (
+              <span className="text-red-500 text-xs sm:text-sm">
+                {errors.cardNumber.message}
               </span>
             )}
           </div>
-          <div className="w-full flex flex-col gap-2">
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input
-              id="lastname"
-              type="text"
-              placeholder="Enter your last name here"
-              {...register("lastname")}
-            />
-            {errors.lastname && (
-              <span className="text-red-500 text-sm">
-                {errors.lastname.message}
-              </span>
-            )}
+
+          {/* Expiry and CVC */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="flex flex-col gap-2 flex-1">
+              <Label htmlFor="expiryMonth" className="text-sm sm:text-base">
+                Expiry month
+              </Label>
+              <ExpiryMonth
+                onValueChange={(value: string) =>
+                  setValue("expiryMonth", value, { shouldDirty: true })
+                }
+                error={errors.expiryMonth?.message}
+              />
+            </div>
+            <div className="flex flex-col gap-2 flex-1">
+              <Label htmlFor="expiryYear" className="text-sm sm:text-base">
+                Expiry year
+              </Label>
+              <ExpiryYear
+                onValueChange={(value: string) =>
+                  setValue("expiryYear", value, { shouldDirty: true })
+                }
+                error={errors.expiryYear?.message}
+              />
+            </div>
+            <div className="flex flex-col gap-2 flex-1">
+              <Label htmlFor="cvc" className="text-sm sm:text-base">
+                CVC
+              </Label>
+              <Input
+                id="cvc"
+                type="text"
+                placeholder="123"
+                className="h-10 sm:h-11 text-sm sm:text-base"
+                {...register("cvc")}
+              />
+              {errors.cvc && (
+                <span className="text-red-500 text-xs sm:text-sm">
+                  {errors.cvc.message}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="cardNumber">Card Number</Label>
-          <Input
-            id="cardNumber"
-            type="text"
-            placeholder="XXXX-XXXX-XXXX-XXXX"
-            {...register("cardNumber")}
-          />
-          {errors.cardNumber && (
-            <span className="text-red-500 text-sm">
-              {errors.cardNumber.message}
-            </span>
-          )}
+        <div className="flex justify-center sm:justify-end pt-2 sm:pt-4">
+          <Button
+            className="w-full sm:w-auto sm:min-w-[150px] h-10 sm:h-11 text-sm sm:text-base"
+            disabled={isSubmitting || !isValid}
+            type="submit"
+          >
+            {isSubmitting ? "Saving..." : "Save changes"}
+          </Button>
         </div>
-
-        <div className="flex justify-between gap-4">
-          <div className="flex flex-col gap-2 flex-1">
-            <Label htmlFor="expiryMonth">Expiry month</Label>
-            <ExpiryMonth
-              onValueChange={(value) =>
-                setValue("expiryMonth", value, { shouldDirty: true })
-              }
-              error={errors.expiryMonth?.message}
-            />
-          </div>
-          <div className="flex flex-col gap-2 flex-1">
-            <Label htmlFor="expiryYear">Expiry year</Label>
-            <ExpiryYear
-              onValueChange={(value) =>
-                setValue("expiryYear", value, { shouldDirty: true })
-              }
-              error={errors.expiryYear?.message}
-            />
-          </div>
-          <div className="flex flex-col gap-2 flex-1">
-            <Label htmlFor="cvc">CVC</Label>
-            <Input
-              id="cvc"
-              type="text"
-              placeholder="123"
-              {...register("cvc")}
-            />
-            {errors.cvc && (
-              <span className="text-red-500 text-sm">{errors.cvc.message}</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex gap-4 justify-end">
-        <Button
-          className="w-full"
-          disabled={isSubmitting || !isValid}
-          type="submit"
-        >
-          {isSubmitting ? "Saving..." : "Save changes"}
-        </Button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 

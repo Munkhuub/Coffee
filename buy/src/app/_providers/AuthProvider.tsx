@@ -17,6 +17,7 @@ export type Profile = {
   createdAt: string;
   updatedAt: string;
 };
+
 export type BankCard = {
   id: number;
   country: string;
@@ -28,6 +29,7 @@ export type BankCard = {
   createdAt: string;
   updatedAt: string;
 };
+
 export type Donation = {
   id: number;
   amount: number;
@@ -66,6 +68,15 @@ type getMeTypes = {
   user: User;
 };
 
+interface ApiError {
+  response?: {
+    data?: {
+      error?: string;
+    };
+  };
+  message?: string;
+}
+
 type AuthContextType = {
   user?: User;
   setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
@@ -89,13 +100,13 @@ type AuthContextType = {
   signOut: () => Promise<void>;
 };
 
-const AuthContext = createContext({} as AuthContextType);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const router = useRouter();
-  const [user, setUser] = useState<User>();
-  const [loading, setLoading] = useState(true); // Start as true
-  const [initialized, setInitialized] = useState(false); // Track initialization
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   const signIn = async ({
     email,
@@ -149,7 +160,15 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       router.push("/createProfile");
     } catch (error) {
       console.error("Signup error:", error);
-      toast.error("Failed to sign up");
+
+      const apiError = error as ApiError;
+      const errorMessage =
+        apiError?.response?.data?.error ||
+        apiError?.message ||
+        "Signup failed. Please try again.";
+
+      toast.error(errorMessage);
+      throw error;
     }
   };
 
@@ -212,4 +231,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

@@ -1,9 +1,6 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
 import { useFormContext } from "../../FormProvider";
 import SelectCountry from "./SelectCountry";
 import { ExpiryMonth } from "./ExpiryMonth";
@@ -43,14 +40,13 @@ type BankCardFormData = z.infer<typeof bankCardSchema>;
 
 const Payment = () => {
   const { prevStep, isSubmitting } = useFormContext();
-  const [bankCard, setBankCard] = useState<BankCard | null>(null);
+
   const { user } = useAuth();
   const Router = useRouter();
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors, isValid },
   } = useForm<BankCardFormData>({
     resolver: zodResolver(bankCardSchema),
@@ -77,8 +73,6 @@ const Payment = () => {
         userId,
         expiryDate,
       });
-
-      setBankCard(response.data);
       console.log("Bank Card created:", response.data);
       Router.push("/");
     } catch (error) {

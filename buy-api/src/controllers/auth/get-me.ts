@@ -1,7 +1,15 @@
-import { RequestHandler } from "express";
 import { prisma } from "../../db";
+import { Request, Response } from "express";
 
-export const getMe = async (req, res) => {
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: number;
+    }
+  }
+}
+
+export const getMe = async (req: Request, res: Response) => {
   const userId = req.userId;
 
   if (!userId) {

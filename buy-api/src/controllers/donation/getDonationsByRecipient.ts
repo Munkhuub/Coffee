@@ -1,6 +1,7 @@
 import { prisma } from "../../db";
+import { Request, Response } from "express";
 
-export const getDonationsByRecipient = async (req, res) => {
+export const getDonationsByRecipient = async (req: Request, res: Response) => {
   const recipientId = parseInt(req.params.userId);
 
   try {

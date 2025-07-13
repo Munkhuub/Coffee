@@ -38,7 +38,7 @@ const RecentSupporters = ({ profile }: RecentSupporterProps) => {
     };
 
     getDonations();
-  }, [profile?.userId]);
+  }, [profile?.userId, profile]);
 
   if (!profile) {
     return (

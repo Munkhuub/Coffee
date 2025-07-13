@@ -1,6 +1,7 @@
 import { prisma } from "../../db";
+import { Request, Response } from "express";
 
-export const updateBankCardById = async (req, res) => {
+export const updateBankCardById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { country, firstname, lastname, cardNumber, expiryDate, cvc } =
     req.body;

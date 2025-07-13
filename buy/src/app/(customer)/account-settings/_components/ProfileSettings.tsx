@@ -1,6 +1,5 @@
 import { ProfileType } from "@/app/(auth)/createProfile/_components/Profile";
 import { UpdateImage } from "@/app/(auth)/createProfile/_components/UpdateImage";
-import { useFormContext } from "@/app/(auth)/FormProvider";
 import { useAuth } from "@/app/_providers/AuthProvider";
 import { api } from "@/axios";
 import { Button } from "@/components/ui/button";
@@ -32,11 +31,26 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
+interface ProfileUpdateData {
+  name?: string;
+  about?: string;
+  socialMediaUrl?: string;
+  avatarImage?: string;
+}
+
+interface ApiError {
+  response?: {
+    data?: {
+      error?: string;
+    };
+  };
+  message?: string;
+}
+
 const ProfileSettings = () => {
-  const { updateFormValues } = useFormContext();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [profile, setProfile] = useState<ProfileType | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -56,7 +70,7 @@ const ProfileSettings = () => {
 
   useEffect(() => {
     if (user?.profile) {
-      const profileData = {
+      const profileData: ProfileFormData = {
         name: user.profile.name || "",
         about: user.profile.about || "",
         socialMediaUrl: user.profile.socialMediaUrl || "",
@@ -64,7 +78,6 @@ const ProfileSettings = () => {
       };
 
       reset(profileData);
-      setProfile(user.profile);
     }
   }, [user?.profile, reset]);
 
@@ -78,58 +91,60 @@ const ProfileSettings = () => {
         throw new Error("Please log in to create a profile");
       }
 
-      console.log("Updating profile for user ID:", id);
+      const updateData: ProfileUpdateData = {};
 
-      const updateData: Partial<ProfileFormData> = {};
-
-      if (dirtyFields.name) {
+      if (dirtyFields.name && data.name !== undefined) {
         updateData.name = data.name;
       }
 
-      if (dirtyFields.about) {
+      if (dirtyFields.about && data.about !== undefined) {
         updateData.about = data.about;
       }
 
-      if (dirtyFields.socialMediaUrl) {
+      if (dirtyFields.socialMediaUrl && data.socialMediaUrl !== undefined) {
         updateData.socialMediaUrl = data.socialMediaUrl;
       }
 
-      if (dirtyFields.avatarImage) {
+      if (dirtyFields.avatarImage && data.avatarImage !== undefined) {
         updateData.avatarImage = data.avatarImage;
       }
 
       if (Object.keys(updateData).length === 0) {
-        console.log("No changes detected, skipping update");
+        toast.info("No changes detected");
         return;
       }
 
-      console.log("Sending update data:", updateData);
+      await api.put<ProfileType>(`/profile/${id}`, updateData);
 
-      const response = await api.put<ProfileType>(`/profile/${id}`, updateData);
-
-      setProfile(response.data);
-      console.log("Profile updated:", response.data);
-      toast.success("Succesfully updated");
+      toast.success("Successfully updated");
     } catch (err) {
-      console.error("Error creating profile:", err);
+      console.error("Error updating profile:", err);
+
+      const apiError = err as ApiError;
+      const errorMessage =
+        apiError?.response?.data?.error ||
+        apiError?.message ||
+        "Failed to update profile";
+
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="text-[14px] w-[650px] flex flex-col gap-6 ">
+    <div className="w-full max-w-[650px] flex flex-col gap-6 px-4 sm:px-0">
       <p className="text-2xl font-semibold">My Profile</p>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-6 rounded-lg border border-[#E4E4E7] p-6"
+        className="flex flex-col gap-6 rounded-lg border border-[#E4E4E7] p-4 sm:p-6"
       >
         <h4 className="font-bold">Personal Info</h4>
         <div className="flex flex-col gap-3">
           <p>Add photo</p>
           <UpdateImage
-            onChange={(url) =>
+            onChange={(url: string) =>
               setValue("avatarImage", url, {
                 shouldValidate: true,
                 shouldDirty: true,

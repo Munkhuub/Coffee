@@ -38,6 +38,17 @@ type ChangePasswordFormProps = {
   onCancel?: () => void;
 };
 
+interface ApiError {
+  response?: {
+    status?: number;
+    data?: {
+      error?: string;
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
 export const ChangePassword = ({
   onSuccess,
   onCancel,
@@ -62,7 +73,7 @@ export const ChangePassword = ({
     mode: "onChange",
   });
 
-  const togglePasswordVisibility = (field: "current" | "new" | "confirm") => {
+  const togglePasswordVisibility = (field: keyof typeof showPasswords) => {
     setShowPasswords((prev) => ({
       ...prev,
       [field]: !prev[field],
@@ -74,23 +85,31 @@ export const ChangePassword = ({
     setApiError(null);
     const userId = user?.id;
 
+    if (!userId) {
+      setApiError("User not authenticated");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await api.post(`/auth/change-password/${userId}`, {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
-        userId: user?.id,
+        userId,
       });
 
       reset();
       onSuccess?.();
       toast.success("Password changed successfully");
-    } catch (error: any) {
-      if (error.response?.status === 400) {
+    } catch (error) {
+      const apiError = error as ApiError;
+
+      if (apiError.response?.status === 400) {
         setError("currentPassword", {
           type: "manual",
           message: "Current password is incorrect",
         });
-      } else if (error.response?.status === 422) {
+      } else if (apiError.response?.status === 422) {
         setApiError("Password doesn't meet server requirements");
       } else {
         setApiError("Failed to change password. Please try again.");
@@ -102,8 +121,10 @@ export const ChangePassword = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg border border-[#E4E4E7] w-[650px]">
-      <h2 className="text-xl font-bold mb-6">Change Password</h2>
+    <div className="bg-white p-4 sm:p-6 rounded-lg border border-[#E4E4E7] w-full max-w-[650px]">
+      <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">
+        Change Password
+      </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-2">
@@ -121,6 +142,9 @@ export const ChangePassword = ({
               type="button"
               onClick={() => togglePasswordVisibility("current")}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              aria-label={
+                showPasswords.current ? "Hide password" : "Show password"
+              }
             >
               {showPasswords.current ? (
                 <EyeOffIcon size={16} />
@@ -151,6 +175,7 @@ export const ChangePassword = ({
               type="button"
               onClick={() => togglePasswordVisibility("new")}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              aria-label={showPasswords.new ? "Hide password" : "Show password"}
             >
               {showPasswords.new ? (
                 <EyeOffIcon size={16} />
@@ -167,7 +192,6 @@ export const ChangePassword = ({
           )}
         </div>
 
-        {/* Confirm New Password */}
         <div className="space-y-2">
           <Label htmlFor="confirmPassword">Confirm New Password</Label>
           <div className="relative">
@@ -183,6 +207,9 @@ export const ChangePassword = ({
               type="button"
               onClick={() => togglePasswordVisibility("confirm")}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              aria-label={
+                showPasswords.confirm ? "Hide password" : "Show password"
+              }
             >
               {showPasswords.confirm ? (
                 <EyeOffIcon size={16} />
@@ -198,15 +225,13 @@ export const ChangePassword = ({
           )}
         </div>
 
-        {/* API Error Message */}
         {apiError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
             {apiError}
           </div>
         )}
 
-        {/* Buttons */}
-        <div className="flex gap-3 pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <Button
             type="submit"
             disabled={isLoading || !isValid}

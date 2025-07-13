@@ -19,7 +19,7 @@ export default function Home() {
     toast("Login to edit profile");
   }
   return (
-    <div className="w-full flex ml-20 ">
+    <div className="w-full flex md:ml-20">
       <SideBar />
       <div className="flex flex-col gap-8">
         <ProfileSettings />

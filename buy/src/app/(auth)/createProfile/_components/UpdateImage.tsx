@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { CameraIcon, XIcon } from "lucide-react";
 import { useState } from "react";

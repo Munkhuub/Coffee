@@ -1,6 +1,7 @@
 import { prisma } from "../../db";
+import { Request, Response } from "express";
 
-export const createProfileController = async (req, res) => {
+export const createProfileController = async (req: Request, res: Response) => {
   const {
     name,
     about,
@@ -62,18 +63,20 @@ export const createProfileController = async (req, res) => {
   } catch (error) {
     console.error("Create profile error:", error);
 
-    if (error.code === "P2002") {
-      return res.status(409).json({
-        message: "Profile already exists for this user",
-        error: "DUPLICATE_PROFILE",
-      });
-    }
+    if (error && typeof error === "object" && "code" in error) {
+      if (error.code === "P2002") {
+        return res.status(409).json({
+          message: "Profile already exists for this user",
+          error: "DUPLICATE_PROFILE",
+        });
+      }
 
-    if (error.code === "P2003") {
-      return res.status(400).json({
-        message: "Invalid user ID",
-        error: "FOREIGN_KEY_CONSTRAINT",
-      });
+      if (error.code === "P2003") {
+        return res.status(400).json({
+          message: "Invalid user ID",
+          error: "FOREIGN_KEY_CONSTRAINT",
+        });
+      }
     }
 
     return res.status(500).json({

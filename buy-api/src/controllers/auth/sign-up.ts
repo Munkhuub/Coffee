@@ -1,23 +1,16 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { RequestHandler } from "express";
+import { Request, Response } from "express";
 import { prisma } from "../../db";
 
-export const signup: RequestHandler = async (req, res) => {
+export const signup = async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
-    res
+    return res
       .status(400)
       .json({ message: "Username, email, and password are required" });
-    return;
   }
-
-  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  // if (!emailRegex.test(email)) {
-  //   res.status(400).json({ message: "Invalid email format" });
-  //   return;
-  // }
 
   try {
     const existingUser = await prisma.user.findFirst({
@@ -25,8 +18,7 @@ export const signup: RequestHandler = async (req, res) => {
     });
 
     if (existingUser) {
-      res.status(400).json({ message: "User already exists" });
-      return;
+      return res.status(400).json({ message: "User already exists" });
     }
 
     const existingUsername = await prisma.user.findFirst({
@@ -34,8 +26,7 @@ export const signup: RequestHandler = async (req, res) => {
     });
 
     if (existingUsername) {
-      res.status(400).json({ message: "Username already taken" });
-      return;
+      return res.status(400).json({ message: "Username already taken" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -71,8 +62,7 @@ export const signup: RequestHandler = async (req, res) => {
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       console.error("JWT_SECRET environment variable is not set");
-      res.status(500).json({ message: "Server configuration error" });
-      return;
+      return res.status(500).json({ message: "Server configuration error" });
     }
 
     const token = jwt.sign(
@@ -84,19 +74,25 @@ export const signup: RequestHandler = async (req, res) => {
 
     const { password: _, ...userWithoutPassword } = newUser;
 
-    res.status(201).json({
+    return res.status(201).json({
       user: userWithoutPassword,
       token: `Bearer ${token}`,
     });
   } catch (error) {
     console.error("Signup error:", error);
 
-    if (error.code === "P2002") {
-      res.status(400).json({ message: "Email or username already exists" });
-      return;
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Email or username already exists" });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server Error",
       error: error instanceof Error ? error.message : "Unknown error",
     });
