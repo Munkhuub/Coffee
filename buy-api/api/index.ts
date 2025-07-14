@@ -18,10 +18,6 @@ app
   .use("/bankCard", bankCardRouter)
   .use("/donation", donationRouter);
 
-app.get("/", (req, res) => {
-  res.json({ message: "Buy Me Coffee API is running!" });
-});
-
 app.get("/api", (req, res) => {
   res.json({ message: "API is healthy!", timestamp: new Date().toISOString() });
 });
