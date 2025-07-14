@@ -13,10 +13,10 @@ const app = express();
 app
   .use(cors())
   .use(express.json())
-  .use("/api/profile", profileRouter)
-  .use("/api/auth", authRouter)
-  .use("/api/bankCard", bankCardRouter)
-  .use("/api/donation", donationRouter);
+  .use("/profile", profileRouter)
+  .use("/auth", authRouter)
+  .use("/bankCard", bankCardRouter)
+  .use("/donation", donationRouter);
 
 app.get("/", (req, res) => {
   res.json({ message: "Buy Me Coffee API is running!" });

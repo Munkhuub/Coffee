@@ -15,9 +15,25 @@ const app = (0, express_1.default)();
 app
     .use((0, cors_1.default)())
     .use(express_1.default.json())
-    .use("/profile", profile_route_1.default)
-    .use("/auth", auth_route_1.default)
-    .use("/bankCard", bankCard_route_1.bankCardRouter)
-    .use("/donation", donation_route_1.donationRouter);
+    .use("/api/profile", profile_route_1.default)
+    .use("/api/auth", auth_route_1.default)
+    .use("/api/bankCard", bankCard_route_1.bankCardRouter)
+    .use("/api/donation", donation_route_1.donationRouter);
+app.get("/", (req, res) => {
+    res.json({ message: "Buy Me Coffee API is running!" });
+});
+app.get("/api", (req, res) => {
+    res.json({ message: "API is healthy!", timestamp: new Date().toISOString() });
+});
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: "Something went wrong!" });
+});
 exports.default = app;
+if (process.env.NODE_ENV !== "production") {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
 //# sourceMappingURL=index.js.map
