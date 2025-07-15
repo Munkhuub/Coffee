@@ -15,13 +15,10 @@ const app = (0, express_1.default)();
 app
     .use((0, cors_1.default)())
     .use(express_1.default.json())
-    .use("/api/profile", profile_route_1.default)
-    .use("/api/auth", auth_route_1.default)
-    .use("/api/bankCard", bankCard_route_1.bankCardRouter)
-    .use("/api/donation", donation_route_1.donationRouter);
-app.get("/", (req, res) => {
-    res.json({ message: "Buy Me Coffee API is running!" });
-});
+    .use("/profile", profile_route_1.default)
+    .use("/auth", auth_route_1.default)
+    .use("/bankCard", bankCard_route_1.bankCardRouter)
+    .use("/donation", donation_route_1.donationRouter);
 app.get("/api", (req, res) => {
     res.json({ message: "API is healthy!", timestamp: new Date().toISOString() });
 });
