@@ -10,6 +10,8 @@ config();
 
 const app = express();
 
+const PORT = process.env.FRONTEND_URL || 3001;
+
 app
   .use(cors())
   .use(express.json())
@@ -27,11 +29,8 @@ app.use((err: any, req: any, res: any, next: any) => {
   res.status(500).json({ error: "Something went wrong!" });
 });
 
-export default app;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
-if (process.env.NODE_ENV !== "production") {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
+export default app;
