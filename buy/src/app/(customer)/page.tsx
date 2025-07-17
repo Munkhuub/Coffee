@@ -16,6 +16,10 @@ export default function Home() {
   return (
     <div className="w-full flex">
       <SideBar />
+      <div>
+        <h1>Product List</h1>
+        <pre>{JSON.stringify(data, null, 2)}</pre>
+      </div>
       <div className="flex flex-col gap-8 pt-11 w-full px-8 md:px-20">
         <AdminProfile />
         <Transactions />
