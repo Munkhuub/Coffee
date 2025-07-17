@@ -10,20 +10,43 @@ config();
 
 const app = express();
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 const corsOptions = {
   origin: [
-    "https://coffee-delta-pearl.vercel.app",
-    "http://localhost:3000", // for local development
+    "https://coffee-git-main-munkhuubs-projects.vercel.app",
+    `https://coffee-delta-pearl.vercel.app`,
+    `http://localhost:3000`, // for local development
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  optionsSuccessStatus: 200,
 };
+app.use(cors(corsOptions));
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (origin && origin.includes("vercel.app")) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
 
 app
-  .use(cors(corsOptions))
   .use(express.json())
   .use("/profile", profileRouter)
   .use("/auth", authRouter)
