@@ -2,8 +2,17 @@
 import AdminProfile from "./_components/AdminProfile";
 import Transactions from "./_components/Transactions";
 import SideBar from "./_components/SideBar";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`)
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      .catch((err) => console.error("API Error:", err));
+  }, []);
   return (
     <div className="w-full flex">
       <SideBar />
