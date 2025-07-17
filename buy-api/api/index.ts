@@ -12,8 +12,18 @@ const app = express();
 
 const PORT = 3001;
 
+const corsOptions = {
+  origin: [
+    "https://coffee-delta-pearl.vercel.app",
+    "http://localhost:3000", // for local development
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
 app
-  .use(cors())
+  .use(cors(corsOptions))
   .use(express.json())
   .use("/profile", profileRouter)
   .use("/auth", authRouter)
