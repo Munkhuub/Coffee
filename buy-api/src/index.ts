@@ -10,15 +10,8 @@ config();
 
 const app = express();
 
-const PORT = process.env.FRONTEND_URL || 3001;
-
 app
-  .use(
-    cors({
-      origin: process.env.FRONTEND_URL || "http://localhost:3000",
-      credentials: true,
-    })
-  )
+  .use(cors())
   .use(express.json())
   .use("/profile", profileRouter)
   .use("/auth", authRouter)
@@ -34,8 +27,11 @@ app.use((err: any, req: any, res: any, next: any) => {
   res.status(500).json({ error: "Something went wrong!" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
 export default app;
+
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}

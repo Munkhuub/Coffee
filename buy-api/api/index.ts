@@ -10,15 +10,10 @@ config();
 
 const app = express();
 
-const PORT = process.env.FRONTEND_URL || 3001;
+const PORT = 3001;
 
 app
-  .use(
-    cors({
-      origin: process.env.FRONTEND_URL || "http://localhost:3000",
-      credentials: true,
-    })
-  )
+  .use(cors())
   .use(express.json())
   .use("/profile", profileRouter)
   .use("/auth", authRouter)
