@@ -109,6 +109,7 @@ export const UpdateCover = ({ defaultValue, onChange }: UpdateImageProps) => {
   };
 
   return (
+    //cover
     <div className="relative w-full h-[200px] sm:h-[319px] bg-[#F4F4F5]">
       <input
         type="file"
