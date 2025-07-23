@@ -10,13 +10,13 @@ config();
 
 const app = express();
 
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 
 const corsOptions = {
   origin: [
+    `https://coffee-tan-theta.vercel.app`,
     "https://coffee-git-main-munkhuubs-projects.vercel.app",
-    `https://coffee-delta-pearl.vercel.app`,
-    `http://localhost:3000`, // for local development
+    `http://localhost:3000`,
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

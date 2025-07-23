@@ -12,8 +12,20 @@ const bankCard_route_1 = require("../src/routes/bankCard.route");
 const donation_route_1 = require("../src/routes/donation.route");
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
+const PORT = 3001;
+const corsOptions = {
+    origin: [
+        "https://coffee-git-main-munkhuubs-projects.vercel.app",
+        `https://coffee-delta-pearl.vercel.app`,
+        `http://localhost:3000`,
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    optionsSuccessStatus: 200,
+};
+app.use((0, cors_1.default)(corsOptions));
 app
-    .use((0, cors_1.default)())
     .use(express_1.default.json())
     .use("/profile", profile_route_1.default)
     .use("/auth", auth_route_1.default)
@@ -26,11 +38,8 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: "Something went wrong!" });
 });
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
 exports.default = app;
-if (process.env.NODE_ENV !== "production") {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
-}
 //# sourceMappingURL=index.js.map
