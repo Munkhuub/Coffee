@@ -74,8 +74,13 @@ const AdminProfile = () => {
 
   if (loading || isLoading) {
     return (
-      <div className="flex items-center justify-center h-64 px-4">
-        Loading...
+      <div className="flex items-center justify-center min-h-[16rem] md:h-64 px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 border-b-2 border-gray-900 mb-4"></div>
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600">
+            Loading...
+          </p>
+        </div>
       </div>
     );
   }
