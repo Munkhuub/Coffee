@@ -211,7 +211,6 @@ const PaymentSettings = () => {
             )}
           </div>
 
-          {/* Expiry and CVC */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="flex flex-col gap-2 flex-1">
               <Label htmlFor="expiryMonth" className="text-sm sm:text-base">
